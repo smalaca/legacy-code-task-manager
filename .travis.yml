@@ -1,0 +1,9 @@
+language: java
+
+jdk:
+  - oraclejdk8
+
+script:
+  - mvn -Pstatic-analysis clean compile
+  - mvn -Pruntime-analysis verify
+  - mvn -Pmutation-tests org.pitest:pitest-maven:scmMutationCoverage
