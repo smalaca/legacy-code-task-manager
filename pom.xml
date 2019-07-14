@@ -10,13 +10,6 @@
 
   <name>ddd-rental</name>
 
-  <scm>
-    <connection>scm:git:https://github.com/smalaca/ddd-rentals-app.git</connection>
-    <developerConnection>scm:git:https://github.com/smalaca/ddd-rentals-app.git</developerConnection>
-    <url>https://github.com/smalaca/ddd-rentals-app/tree/${project.scm.tag}</url>
-    <tag>master</tag>
-  </scm>
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.build.directory>target</project.build.directory>
@@ -35,7 +28,6 @@
     <maven-checkstyle-plugin.version>3.1.0</maven-checkstyle-plugin.version>
     <maven-pmd-plugin.version>3.12.0</maven-pmd-plugin.version>
     <spotbugs-maven-plugin.version>3.1.12</spotbugs-maven-plugin.version>
-    <maven-scm-plugin.version>1.11.2</maven-scm-plugin.version>
     <pitest-maven.version>1.4.9</pitest-maven.version>
     <pitest-junit5-plugin.version>0.9</pitest-junit5-plugin.version>
   </properties>
@@ -91,15 +83,6 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${maven-compiler-plugin.version}</version>
       </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>${maven-surefire-plugin.version}</version>
-        <configuration>
-          <argLine>${surefireArgLine} -Xmx256m</argLine>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
 
@@ -108,6 +91,15 @@
       <id>runtime-analysis</id>
       <build>
         <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>${maven-surefire-plugin.version}</version>
+            <configuration>
+              <argLine>${surefireArgLine} -Xmx256m</argLine>
+            </configuration>
+          </plugin>
+
           <plugin>
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
@@ -233,15 +225,6 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-scm-plugin</artifactId>
-            <version>${maven-scm-plugin.version}</version>
-            <configuration>
-              <goals>install</goals>
-            </configuration>
-          </plugin>
-
-          <plugin>
             <groupId>org.pitest</groupId>
             <artifactId>pitest-maven</artifactId>
             <version>${pitest-maven.version}</version>
@@ -266,7 +249,7 @@
                 <id>pit-report</id>
                 <phase>test</phase>
                 <goals>
-                  <goal>scmMutationCoverage</goal>
+                  <goal>mutationCoverage</goal>
                 </goals>
               </execution>
             </executions>

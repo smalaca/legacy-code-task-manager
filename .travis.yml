@@ -6,4 +6,4 @@ jdk:
 script:
   - mvn -Pstatic-analysis clean compile
   - mvn -Pruntime-analysis verify
-  - mvn -Pmutation-tests org.pitest:pitest-maven:scmMutationCoverage
+  - mvn -Pmutation-tests verify org.pitest:pitest-maven:mutationCoverage
