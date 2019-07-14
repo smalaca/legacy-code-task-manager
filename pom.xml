@@ -37,6 +37,7 @@
     <spotbugs-maven-plugin.version>3.1.12</spotbugs-maven-plugin.version>
     <maven-scm-plugin.version>1.11.2</maven-scm-plugin.version>
     <pitest-maven.version>1.4.9</pitest-maven.version>
+    <pitest-junit5-plugin.version>0.9</pitest-junit5-plugin.version>
   </properties>
 
   <dependencies>
@@ -231,7 +232,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-scm-plugin</artifactId>
-            <version>1.11.2</version>
+            <version>${maven-scm-plugin.version}</version>
             <configuration>
               <goals>install</goals>
             </configuration>
@@ -243,12 +244,20 @@
             <version>${pitest-maven.version}</version>
             <configuration>
               <targetClasses>
-                <param>org.smalaca.*</param>
+                <param>com.smalaca.*</param>
               </targetClasses>
               <targetTests>
-                <param>org.smalaca.*</param>
+                <param>com.smalaca.*</param>
               </targetTests>
+              <maxSurviving>0</maxSurviving>
             </configuration>
+            <dependencies>
+              <dependency>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-junit5-plugin</artifactId>
+                <version>${pitest-junit5-plugin.version}</version>
+              </dependency>
+            </dependencies>
             <executions>
               <execution>
                 <id>pit-report</id>
