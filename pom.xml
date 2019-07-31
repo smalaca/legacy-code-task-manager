@@ -8,7 +8,7 @@
   <artifactId>ddd-rental</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>ddd-rental</name>
+  <name>template-project</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

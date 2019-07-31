@@ -4,11 +4,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class RentalAppTest {
+class TemplateProjectAppTest {
     @Test
     void shouldReturnName() {
-        String result = new RentalApp().name();
+        String result = new TemplateProjectApp().name();
 
-        assertThat(result).isEqualTo("Domain Driven Design Rental App");
+        assertThat(result).isEqualTo("Template Project");
     }
 }
