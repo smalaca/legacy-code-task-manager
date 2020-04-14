@@ -221,7 +221,7 @@
               </execution>
             </executions>
             <configuration>
-              <targetJdk>9</targetJdk>
+              <targetJdk>11</targetJdk>
               <linkXRef>false</linkXRef>
             </configuration>
           </plugin>
