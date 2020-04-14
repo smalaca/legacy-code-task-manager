@@ -52,7 +52,6 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
@@ -180,6 +179,9 @@
                       </limits>
                     </rule>
                   </rules>
+                  <excludes>
+                    <exclude>com/smalaca/taskamanager/TaskManagerApplication.class</exclude>
+                  </excludes>
                 </configuration>
               </execution>
             </executions>

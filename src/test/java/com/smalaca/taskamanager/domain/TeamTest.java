@@ -11,5 +11,6 @@ class TeamTest {
         Team actual = new Team("Avengers");
 
         assertThat(actual.getName()).isEqualTo("Avengers");
+        assertThat(actual.getId()).isNull();
     }
 }
