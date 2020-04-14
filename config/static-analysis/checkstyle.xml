@@ -116,7 +116,10 @@
         <module name="ParameterName"/>
         <module name="StaticVariableName"/>
         <module name="TypeName"/>
+        <module name="SuppressWarningsHolder"/>
     </module>
+
+    <module name="SuppressWarningsFilter"/>
 
     <module name="LineLength">
         <property name="max" value="150"/>

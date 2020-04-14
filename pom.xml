@@ -15,8 +15,8 @@
     <project.build.directory>target</project.build.directory>
     <project.config.directory>config</project.config.directory>
 
-    <maven.compiler.source>1.9</maven.compiler.source>
-    <maven.compiler.target>1.9</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
 
     <assertj.core.version>3.15.0</assertj.core.version>
     <guava.version>28.2-jre</guava.version>
@@ -224,7 +224,8 @@
               </execution>
             </executions>
             <configuration>
-              <targetJdk>9</targetJdk>
+              <targetJdk>11</targetJdk>
+              <linkXRef>false</linkXRef>
             </configuration>
           </plugin>
 
