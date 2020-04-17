@@ -10,7 +10,13 @@ matrix:
         - rm "${JAVA_HOME}/lib/security/cacerts"
         - ln -s /etc/ssl/certs/java/cacerts "${JAVA_HOME}/lib/security/cacerts"
 
+addons:
+  sonarcloud:
+    organization: "smalaca-github"
+    token: $LEGACY_CODE_TASK_MANAGER_TOKEN
+
 script:
   - mvn -Pstatic-analysis clean compile
   - mvn -Pruntime-analysis verify
   - mvn -Pmutation-tests verify org.pitest:pitest-maven:mutationCoverage
+  - sonar-scanner

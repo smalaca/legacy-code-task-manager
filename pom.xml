@@ -32,6 +32,12 @@
     <commons-lang3.version>3.9</commons-lang3.version>
   </properties>
 
+  <scm>
+    <url>https://github.com/smalaca/legacy-code-task-manager</url>
+    <connection>scm:git:https://github.com/smalaca/legacy-code-task-manager.git</connection>
+    <developerConnection>scm:git:https://github.com/smalaca/legacy-code-task-manager.git</developerConnection>
+  </scm>
+
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
