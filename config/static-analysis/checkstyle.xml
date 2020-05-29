@@ -27,20 +27,16 @@
         <module name="AvoidStarImport"/>
         <module name="BooleanExpressionComplexity"/>
         <module name="ClassDataAbstractionCoupling">
-            <property name="max" value="5"/>
+            <property name="max" value="20"/>
         </module>
         <module name="ClassFanOutComplexity">
-            <property name="max" value="10"/>
+            <property name="max" value="20"/>
         </module>
         <module name="ClassTypeParameterName"/>
         <module name="ConstantName"/>
         <module name="CovariantEquals"/>
-        <module name="CustomImportOrder">
-            <property name="separateLineBetweenGroups" value="true"/>
-            <property name="sortImportsInGroupAlphabetically" value="true"/>
-        </module>
         <module name="CyclomaticComplexity">
-            <property name="max" value="7"/>
+            <property name="max" value="20"/>
         </module>
         <module name="DefaultComesLast"/>
         <module name="EmptyBlock"/>
@@ -65,7 +61,7 @@
             <property name="maxTotal" value="20"/>
         </module>
         <module name="MethodLength">
-            <property name="max" value="40"/>
+            <property name="max" value="100"/>
         </module>
         <module name="MissingSwitchDefault"/>
         <module name="ModifiedControlVariable"/>
