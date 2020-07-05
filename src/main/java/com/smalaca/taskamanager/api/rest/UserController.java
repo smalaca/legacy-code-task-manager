@@ -199,7 +199,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    private User getUserById(@PathVariable("id") Long id) {
+    private User getUserById(Long id) {
         Optional<User> user;
         user = userRepository.findById(id);
 
