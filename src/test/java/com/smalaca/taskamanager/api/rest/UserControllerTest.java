@@ -185,5 +185,6 @@ class UserControllerTest {
         ResponseEntity<Void> response = controller.deleteUser(EXISTING_USER_ID);
 
         assertThat(response.getStatusCode()).isEqualTo(OK);
+        assertThat(controller.getUser(EXISTING_USER_ID).getStatusCode()).isEqualTo(NOT_FOUND);
     }
 }
