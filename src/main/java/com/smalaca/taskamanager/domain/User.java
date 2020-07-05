@@ -6,6 +6,9 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class User {
@@ -25,6 +28,9 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private TeamRole teamRole;
+
+    @OneToMany
+    private List<Team> teams = new ArrayList<>();
 
     public String getFirstName() {
         return firstName;
@@ -84,5 +90,17 @@ public class User {
 
     public Long getId() {
         return id;
+    }
+
+    public void setTeams(List<Team> teams) {
+        this.teams = teams;
+    }
+
+    public List<Team> getTeams() {
+        return teams;
+    }
+
+    public void addToTeam(Team team) {
+        teams.add(team);
     }
 }
