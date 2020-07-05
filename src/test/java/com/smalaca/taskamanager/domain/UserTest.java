@@ -2,8 +2,8 @@ package com.smalaca.taskamanager.domain;
 
 import org.junit.jupiter.api.Test;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class UserTest {
 
@@ -27,5 +27,17 @@ class UserTest {
         assertThat(user.getPhoneNumber().getPrefix()).isEqualTo("4NT");
         assertThat(user.getPhoneNumber().getNumber()).isEqualTo("421399999");
         assertThat(user.getEmailAddress().getEmailAddress()).isEqualTo("antman@avengers.com");
+    }
+
+    @Test
+    void shouldCreateUserWithTeams() {
+        Team team1 = new Team("Avengers");
+        Team team2 = new Team("X-Men");
+        Team team3 = new Team("X Force");
+        User user = new User();
+
+        user.setTeams(asList(team1, team2, team3));
+
+        assertThat(user.getTeams()).containsExactlyInAnyOrder(team1, team2, team3);
     }
 }
