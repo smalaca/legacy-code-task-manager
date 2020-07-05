@@ -31,13 +31,26 @@ class TeamRepositoryTest {
         found.setName("FF");
         teamRepository.save(found);
 
-        Iterable<Team> teams = teamRepository.findAll();
+        Iterable<Team> actual = teamRepository.findAll();
 
-        assertThat(teams).hasSize(4)
+        assertThat(actual).hasSize(4)
                 .anyMatch(hasNameEqualTo("FF"))
                 .anyMatch(hasNameEqualTo("Avengers"))
                 .anyMatch(hasNameEqualTo("X-Men"))
                 .anyMatch(hasNameEqualTo("Champions"));
+    }
+
+    @Test
+    void shouldFindTeamByName() {
+        teamRepository.saveAll(asList(
+                new Team("Avengers"),
+                new Team("X-Men"),
+                new Team("Champions")
+        ));
+
+        Team actual = teamRepository.findByName("X-Men").get();
+
+        assertThat(actual.getName()).isEqualTo("X-Men");
     }
 
     private Predicate<Team> hasNameEqualTo(String name) {
