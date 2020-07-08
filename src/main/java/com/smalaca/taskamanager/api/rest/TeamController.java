@@ -109,7 +109,7 @@ public class TeamController {
 
     @PutMapping("/{id}/members")
     @Transactional
-    ResponseEntity<Void> addTeamMembers(@PathVariable Long id, TeamMembersDto dto) {
+    public ResponseEntity<Void> addTeamMembers(@PathVariable Long id, @RequestBody TeamMembersDto dto) {
         try {
             Team team = getTeamById(id);
             Iterable<User> users = findUsers(dto);
@@ -121,6 +121,27 @@ public class TeamController {
             users.forEach(user -> {
                 user.addToTeam(team);
                 team.addMember(user);
+            });
+
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (TeamNotFoundException exception) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/{id}/members")
+    @Transactional
+    public ResponseEntity<Void> removeTeamMembers(@PathVariable Long id, @RequestBody TeamMembersDto dto) {
+        try {
+            Team team = getTeamById(id);
+            Iterable<User> users = findUsers(dto);
+
+            users.forEach(user -> {
+                if (user.getTeams().contains(team)) {
+                    user.removeFrom(team);
+                    team.removeMember(user);
+                }
             });
 
             return new ResponseEntity<>(HttpStatus.OK);

@@ -149,14 +149,14 @@ class TeamControllerTest {
     }
 
     @Test
-    void shouldReturnNotFoundWhenAddingUsersToNonExistingTeam() {
+    void shouldReturnNotFoundWhenAddingTeamMembersToNonExistingTeam() {
         ResponseEntity<Void> response = controller.addTeamMembers(NOT_EXISTING_TEAM_ID, teamMembersDto(1L, 2L, 5L));
 
         assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
     }
 
     @Test
-    void shouldAddUsersToTeam() {
+    void shouldAddTeamMembersToTeam() {
         ResponseEntity<Void> response = controller.addTeamMembers(EXISTING_TEAM_ID, teamMembersDto(1L, 2L, 5L));
 
         assertThat(response.getStatusCode()).isEqualTo(OK);
@@ -165,8 +165,8 @@ class TeamControllerTest {
     }
 
     @Test
-    void shouldAddUsersToTeamWhitTeamMembers() {
-        controller.addTeamMembers(EXISTING_TEAM_ID, teamMembersDto(1L, 2L, 5L));
+    void shouldAddTeamMembersToTeamWhitTeamMembers() {
+        givenTeamWithTeamMembers();
 
         controller.addTeamMembers(EXISTING_TEAM_ID, teamMembersDto(4L));
 
@@ -175,12 +175,58 @@ class TeamControllerTest {
     }
 
     @Test
-    void shouldReturnNotFoundWhenAddingNonExistingUsersToTeam() {
+    void shouldReturnNotFoundWhenAddingNonExistingTeamMembersToTeam() {
         TeamMembersDto dto = teamMembersDto(1L, 2L, NOT_EXISTING_USER_ID);
 
         ResponseEntity<Void> response = controller.addTeamMembers(EXISTING_TEAM_ID, dto);
 
         assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenRemovingTeamMembersFromNonExistingTeam() {
+        givenTeamWithTeamMembers();
+
+        ResponseEntity<Void> response = controller.removeTeamMembers(NOT_EXISTING_TEAM_ID, teamMembersDto(1L, 2L, 5L));
+
+        assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
+    }
+
+    @Test
+    void shouldRemoveTeamMembersFromTeam() {
+        givenTeamWithTeamMembers();
+
+        ResponseEntity<Void> response = controller.removeTeamMembers(EXISTING_TEAM_ID, teamMembersDto(1L, 5L));
+
+        assertThat(response.getStatusCode()).isEqualTo(OK);
+        TeamDto teamDto = controller.findById(EXISTING_TEAM_ID).getBody();
+        assertThat(teamDto.getUserIds()).containsExactlyInAnyOrder(2L);
+    }
+
+    @Test
+    void shouldRemoveOnlyMembersOfTeamFromTeam() {
+        givenTeamWithTeamMembers();
+
+        ResponseEntity<Void> response = controller.removeTeamMembers(EXISTING_TEAM_ID, teamMembersDto(1L, 3L, 4L));
+
+        assertThat(response.getStatusCode()).isEqualTo(OK);
+        TeamDto teamDto = controller.findById(EXISTING_TEAM_ID).getBody();
+        assertThat(teamDto.getUserIds()).containsExactlyInAnyOrder(2L, 5L);
+    }
+
+    @Test
+    void shouldRemoveOnlyMembersOfTeamFromTeamEvenWhenNonExistingTeamMemberGiven() {
+        givenTeamWithTeamMembers();
+
+        ResponseEntity<Void> response = controller.removeTeamMembers(EXISTING_TEAM_ID, teamMembersDto(1L, 3L, NOT_EXISTING_USER_ID));
+
+        assertThat(response.getStatusCode()).isEqualTo(OK);
+        TeamDto teamDto = controller.findById(EXISTING_TEAM_ID).getBody();
+        assertThat(teamDto.getUserIds()).containsExactlyInAnyOrder(2L, 5L);
+    }
+
+    private void givenTeamWithTeamMembers() {
+        controller.addTeamMembers(EXISTING_TEAM_ID, teamMembersDto(1L, 2L, 5L));
     }
 
     private TeamMembersDto teamMembersDto(Long... userIds) {
