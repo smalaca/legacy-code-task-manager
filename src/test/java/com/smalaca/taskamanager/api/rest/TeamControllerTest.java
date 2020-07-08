@@ -1,5 +1,6 @@
 package com.smalaca.taskamanager.api.rest;
 
+import com.smalaca.taskamanager.domain.User;
 import com.smalaca.taskamanager.dto.TeamDto;
 import com.smalaca.taskamanager.dto.TeamMembersDto;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,9 @@ class TeamControllerTest {
     private static final TeamDto NO_TEAM_DATA = null;
     private static final Long NOT_EXISTING_USER_ID = 113L;
 
-    private final TeamController controller = new TeamController(new InMemoryTeamRepository(), new InMemoryUserRepository());
+    private final InMemoryUserRepository userRepository = new InMemoryUserRepository();
+
+    private final TeamController controller = new TeamController(new InMemoryTeamRepository(), userRepository);
 
     @Test
     void shouldReturnAllTeams() {
@@ -162,6 +165,9 @@ class TeamControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(OK);
         TeamDto teamDto = controller.findById(EXISTING_TEAM_ID).getBody();
         assertThat(teamDto.getUserIds()).containsExactlyInAnyOrder(1L, 2L, 5L);
+        assertUserAssignedToTeam(1L);
+        assertUserAssignedToTeam(2L);
+        assertUserAssignedToTeam(5L);
     }
 
     @Test
@@ -172,6 +178,17 @@ class TeamControllerTest {
 
         TeamDto teamDto = controller.findById(EXISTING_TEAM_ID).getBody();
         assertThat(teamDto.getUserIds()).containsExactlyInAnyOrder(1L, 2L, 4L, 5L);
+        assertUserAssignedToTeam(1L);
+        assertUserAssignedToTeam(2L);
+        assertUserAssignedToTeam(4L);
+        assertUserAssignedToTeam(5L);
+    }
+
+    private void assertUserAssignedToTeam(long userId) {
+        User user = userRepository.findById(userId).get();
+
+        assertThat(user.getTeams())
+                .anySatisfy(team -> assertThat(team.getId()).isEqualTo(EXISTING_TEAM_ID));
     }
 
     @Test
@@ -201,6 +218,8 @@ class TeamControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(OK);
         TeamDto teamDto = controller.findById(EXISTING_TEAM_ID).getBody();
         assertThat(teamDto.getUserIds()).containsExactlyInAnyOrder(2L);
+        assertUserRemovedFromTeam(1L);
+        assertUserRemovedFromTeam(5L);
     }
 
     @Test
@@ -212,6 +231,7 @@ class TeamControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(OK);
         TeamDto teamDto = controller.findById(EXISTING_TEAM_ID).getBody();
         assertThat(teamDto.getUserIds()).containsExactlyInAnyOrder(2L, 5L);
+        assertUserRemovedFromTeam(1L);
     }
 
     @Test
@@ -223,6 +243,14 @@ class TeamControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(OK);
         TeamDto teamDto = controller.findById(EXISTING_TEAM_ID).getBody();
         assertThat(teamDto.getUserIds()).containsExactlyInAnyOrder(2L, 5L);
+        assertUserRemovedFromTeam(1L);
+    }
+
+    private void assertUserRemovedFromTeam(long userId) {
+        User user = userRepository.findById(userId).get();
+
+        assertThat(user.getTeams())
+                .noneSatisfy(team -> assertThat(team.getId()).isEqualTo(EXISTING_TEAM_ID));
     }
 
     private void givenTeamWithTeamMembers() {
