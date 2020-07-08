@@ -31,9 +31,13 @@ public class PhoneNumber {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o) {
+            return true;
+        }
 
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         PhoneNumber that = (PhoneNumber) o;
 
@@ -44,6 +48,7 @@ public class PhoneNumber {
     }
 
     @Override
+    @SuppressWarnings("MagicNumber")
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(prefix)

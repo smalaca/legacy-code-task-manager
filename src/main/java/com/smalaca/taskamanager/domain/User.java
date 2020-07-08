@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@SuppressWarnings("MethodCount")
 public class User {
     @Id
     @GeneratedValue
@@ -116,9 +117,13 @@ public class User {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o) {
+            return true;
+        }
 
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         User user = (User) o;
 
@@ -135,6 +140,7 @@ public class User {
     }
 
     @Override
+    @SuppressWarnings("MagicNumber")
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(id)

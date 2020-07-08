@@ -60,9 +60,13 @@ public class Team {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o) {
+            return true;
+        }
 
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         Team team = (Team) o;
 
@@ -73,6 +77,7 @@ public class Team {
     }
 
     @Override
+    @SuppressWarnings("MagicNumber")
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(id)
