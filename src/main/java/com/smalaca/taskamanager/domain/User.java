@@ -1,5 +1,8 @@
 package com.smalaca.taskamanager.domain;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -11,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@SuppressWarnings("MethodCount")
 public class User {
     @Id
     @GeneratedValue
@@ -93,7 +97,7 @@ public class User {
     }
 
     public void setTeams(List<Team> teams) {
-        this.teams = teams;
+        this.teams = new ArrayList<>(teams);
     }
 
     public List<Team> getTeams() {
@@ -102,5 +106,51 @@ public class User {
 
     public void addToTeam(Team team) {
         teams.add(team);
+    }
+
+    public void removeFrom(Team team) {
+        if (!teams.contains(team)) {
+            throw new RuntimeException();
+        }
+        teams.remove(team);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        User user = (User) o;
+
+        return new EqualsBuilder()
+                .append(id, user.id)
+                .append(firstName, user.firstName)
+                .append(lastName, user.lastName)
+                .append(login, user.login)
+                .append(password, user.password)
+                .append(phoneNumber, user.phoneNumber)
+                .append(emailAddress, user.emailAddress)
+                .append(teamRole, user.teamRole)
+                .isEquals();
+    }
+
+    @Override
+    @SuppressWarnings("MagicNumber")
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(id)
+                .append(firstName)
+                .append(lastName)
+                .append(login)
+                .append(password)
+                .append(phoneNumber)
+                .append(emailAddress)
+                .append(teamRole)
+                .toHashCode();
     }
 }

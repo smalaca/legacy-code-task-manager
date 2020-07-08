@@ -1,6 +1,8 @@
 package com.smalaca.taskamanager.api.rest;
 
+import com.smalaca.taskamanager.domain.User;
 import com.smalaca.taskamanager.dto.TeamDto;
+import com.smalaca.taskamanager.dto.TeamMembersDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +11,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.List;
 import java.util.UUID;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -21,8 +24,11 @@ class TeamControllerTest {
     private static final String EXISTING_TEAM_NAME = "Avengers";
     private static final Long NOT_EXISTING_TEAM_ID = 101L;
     private static final TeamDto NO_TEAM_DATA = null;
+    private static final Long NOT_EXISTING_USER_ID = 113L;
 
-    private final TeamController controller = new TeamController(new InMemoryTeamRepository());
+    private final InMemoryUserRepository userRepository = new InMemoryUserRepository();
+
+    private final TeamController controller = new TeamController(new InMemoryTeamRepository(), userRepository);
 
     @Test
     void shouldReturnAllTeams() {
@@ -107,6 +113,7 @@ class TeamControllerTest {
     private void assertTeam(TeamDto teamDto) {
         assertThat(teamDto.getId()).isEqualTo(EXISTING_TEAM_ID);
         assertThat(teamDto.getName()).isEqualTo(EXISTING_TEAM_NAME);
+        assertThat(teamDto.getUserIds()).isEmpty();
     }
 
     @Test
@@ -142,5 +149,117 @@ class TeamControllerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(OK);
         assertThat(controller.findById(EXISTING_TEAM_ID).getStatusCode()).isEqualTo(NOT_FOUND);
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenAddingTeamMembersToNonExistingTeam() {
+        ResponseEntity<Void> response = controller.addTeamMembers(NOT_EXISTING_TEAM_ID, teamMembersDto(1L, 2L, 5L));
+
+        assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
+    }
+
+    @Test
+    void shouldAddTeamMembersToTeam() {
+        ResponseEntity<Void> response = controller.addTeamMembers(EXISTING_TEAM_ID, teamMembersDto(1L, 2L, 5L));
+
+        assertThat(response.getStatusCode()).isEqualTo(OK);
+        TeamDto teamDto = controller.findById(EXISTING_TEAM_ID).getBody();
+        assertThat(teamDto.getUserIds()).containsExactlyInAnyOrder(1L, 2L, 5L);
+        assertUserAssignedToTeam(1L);
+        assertUserAssignedToTeam(2L);
+        assertUserAssignedToTeam(5L);
+    }
+
+    @Test
+    void shouldAddTeamMembersToTeamWhitTeamMembers() {
+        givenTeamWithTeamMembers();
+
+        controller.addTeamMembers(EXISTING_TEAM_ID, teamMembersDto(4L));
+
+        TeamDto teamDto = controller.findById(EXISTING_TEAM_ID).getBody();
+        assertThat(teamDto.getUserIds()).containsExactlyInAnyOrder(1L, 2L, 4L, 5L);
+        assertUserAssignedToTeam(1L);
+        assertUserAssignedToTeam(2L);
+        assertUserAssignedToTeam(4L);
+        assertUserAssignedToTeam(5L);
+    }
+
+    private void assertUserAssignedToTeam(long userId) {
+        User user = userRepository.findById(userId).get();
+
+        assertThat(user.getTeams())
+                .anySatisfy(team -> assertThat(team.getId()).isEqualTo(EXISTING_TEAM_ID));
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenAddingNonExistingTeamMembersToTeam() {
+        TeamMembersDto dto = teamMembersDto(1L, 2L, NOT_EXISTING_USER_ID);
+
+        ResponseEntity<Void> response = controller.addTeamMembers(EXISTING_TEAM_ID, dto);
+
+        assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenRemovingTeamMembersFromNonExistingTeam() {
+        givenTeamWithTeamMembers();
+
+        ResponseEntity<Void> response = controller.removeTeamMembers(NOT_EXISTING_TEAM_ID, teamMembersDto(1L, 2L, 5L));
+
+        assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
+    }
+
+    @Test
+    void shouldRemoveTeamMembersFromTeam() {
+        givenTeamWithTeamMembers();
+
+        ResponseEntity<Void> response = controller.removeTeamMembers(EXISTING_TEAM_ID, teamMembersDto(1L, 5L));
+
+        assertThat(response.getStatusCode()).isEqualTo(OK);
+        TeamDto teamDto = controller.findById(EXISTING_TEAM_ID).getBody();
+        assertThat(teamDto.getUserIds()).containsExactlyInAnyOrder(2L);
+        assertUserRemovedFromTeam(1L);
+        assertUserRemovedFromTeam(5L);
+    }
+
+    @Test
+    void shouldRemoveOnlyMembersOfTeamFromTeam() {
+        givenTeamWithTeamMembers();
+
+        ResponseEntity<Void> response = controller.removeTeamMembers(EXISTING_TEAM_ID, teamMembersDto(1L, 3L, 4L));
+
+        assertThat(response.getStatusCode()).isEqualTo(OK);
+        TeamDto teamDto = controller.findById(EXISTING_TEAM_ID).getBody();
+        assertThat(teamDto.getUserIds()).containsExactlyInAnyOrder(2L, 5L);
+        assertUserRemovedFromTeam(1L);
+    }
+
+    @Test
+    void shouldRemoveOnlyMembersOfTeamFromTeamEvenWhenNonExistingTeamMemberGiven() {
+        givenTeamWithTeamMembers();
+
+        ResponseEntity<Void> response = controller.removeTeamMembers(EXISTING_TEAM_ID, teamMembersDto(1L, 3L, NOT_EXISTING_USER_ID));
+
+        assertThat(response.getStatusCode()).isEqualTo(OK);
+        TeamDto teamDto = controller.findById(EXISTING_TEAM_ID).getBody();
+        assertThat(teamDto.getUserIds()).containsExactlyInAnyOrder(2L, 5L);
+        assertUserRemovedFromTeam(1L);
+    }
+
+    private void assertUserRemovedFromTeam(long userId) {
+        User user = userRepository.findById(userId).get();
+
+        assertThat(user.getTeams())
+                .noneSatisfy(team -> assertThat(team.getId()).isEqualTo(EXISTING_TEAM_ID));
+    }
+
+    private void givenTeamWithTeamMembers() {
+        controller.addTeamMembers(EXISTING_TEAM_ID, teamMembersDto(1L, 2L, 5L));
+    }
+
+    private TeamMembersDto teamMembersDto(Long... userIds) {
+        TeamMembersDto dto = new TeamMembersDto();
+        dto.setUserIds(asList(userIds));
+        return dto;
     }
 }
