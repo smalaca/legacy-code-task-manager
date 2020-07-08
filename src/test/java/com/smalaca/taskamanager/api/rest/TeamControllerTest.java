@@ -1,6 +1,7 @@
 package com.smalaca.taskamanager.api.rest;
 
 import com.smalaca.taskamanager.dto.TeamDto;
+import com.smalaca.taskamanager.dto.TeamMembersDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.List;
 import java.util.UUID;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -21,8 +23,9 @@ class TeamControllerTest {
     private static final String EXISTING_TEAM_NAME = "Avengers";
     private static final Long NOT_EXISTING_TEAM_ID = 101L;
     private static final TeamDto NO_TEAM_DATA = null;
+    private static final Long NOT_EXISTING_USER_ID = 113L;
 
-    private final TeamController controller = new TeamController(new InMemoryTeamRepository());
+    private final TeamController controller = new TeamController(new InMemoryTeamRepository(), new InMemoryUserRepository());
 
     @Test
     void shouldReturnAllTeams() {
@@ -107,6 +110,7 @@ class TeamControllerTest {
     private void assertTeam(TeamDto teamDto) {
         assertThat(teamDto.getId()).isEqualTo(EXISTING_TEAM_ID);
         assertThat(teamDto.getName()).isEqualTo(EXISTING_TEAM_NAME);
+        assertThat(teamDto.getUserIds()).isEmpty();
     }
 
     @Test
@@ -142,5 +146,46 @@ class TeamControllerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(OK);
         assertThat(controller.findById(EXISTING_TEAM_ID).getStatusCode()).isEqualTo(NOT_FOUND);
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenAddingUsersToNonExistingTeam() {
+        ResponseEntity<Void> response = controller.addTeamMembers(NOT_EXISTING_TEAM_ID, teamMembersDto(1L, 2L, 5L));
+
+        assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
+    }
+
+    @Test
+    void shouldAddUsersToTeam() {
+        ResponseEntity<Void> response = controller.addTeamMembers(EXISTING_TEAM_ID, teamMembersDto(1L, 2L, 5L));
+
+        assertThat(response.getStatusCode()).isEqualTo(OK);
+        TeamDto teamDto = controller.findById(EXISTING_TEAM_ID).getBody();
+        assertThat(teamDto.getUserIds()).containsExactlyInAnyOrder(1L, 2L, 5L);
+    }
+
+    @Test
+    void shouldAddUsersToTeamWhitTeamMembers() {
+        controller.addTeamMembers(EXISTING_TEAM_ID, teamMembersDto(1L, 2L, 5L));
+
+        controller.addTeamMembers(EXISTING_TEAM_ID, teamMembersDto(4L));
+
+        TeamDto teamDto = controller.findById(EXISTING_TEAM_ID).getBody();
+        assertThat(teamDto.getUserIds()).containsExactlyInAnyOrder(1L, 2L, 4L, 5L);
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenAddingNonExistingUsersToTeam() {
+        TeamMembersDto dto = teamMembersDto(1L, 2L, NOT_EXISTING_USER_ID);
+
+        ResponseEntity<Void> response = controller.addTeamMembers(EXISTING_TEAM_ID, dto);
+
+        assertThat(response.getStatusCode()).isEqualTo(NOT_FOUND);
+    }
+
+    private TeamMembersDto teamMembersDto(Long... userIds) {
+        TeamMembersDto dto = new TeamMembersDto();
+        dto.setUserIds(asList(userIds));
+        return dto;
     }
 }

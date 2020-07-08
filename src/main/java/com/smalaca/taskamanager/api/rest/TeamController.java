@@ -1,13 +1,18 @@
 package com.smalaca.taskamanager.api.rest;
 
 
+import com.google.common.collect.Iterables;
 import com.smalaca.taskamanager.domain.Team;
 import com.smalaca.taskamanager.domain.TeamRepository;
+import com.smalaca.taskamanager.domain.User;
+import com.smalaca.taskamanager.domain.UserRepository;
 import com.smalaca.taskamanager.dto.TeamDto;
+import com.smalaca.taskamanager.dto.TeamMembersDto;
 import com.smalaca.taskamanager.exception.TeamNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,9 +33,11 @@ import static java.util.stream.Collectors.toList;
 @RequestMapping("/team")
 public class TeamController {
     private final TeamRepository teamRepository;
+    private final UserRepository userRepository;
 
-    public TeamController(TeamRepository teamRepository) {
+    public TeamController(TeamRepository teamRepository, UserRepository userRepository) {
         this.teamRepository = teamRepository;
+        this.userRepository = userRepository;
     }
 
     @GetMapping
@@ -48,12 +55,14 @@ public class TeamController {
     }
 
     @GetMapping("/{id}")
+    @Transactional
     public ResponseEntity<TeamDto> findById(@PathVariable Long id) {
         try {
             Team team = getTeamById(id);
             TeamDto dto = new TeamDto();
             dto.setId(team.getId());
             dto.setName(team.getName());
+            dto.setUserIds(team.getMembers().stream().map(User::getId).collect(toList()));
 
             return new ResponseEntity<>(dto, HttpStatus.OK);
         } catch (TeamNotFoundException exception) {
@@ -96,6 +105,33 @@ public class TeamController {
         dto.setName(updated.getName());
 
         return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}/members")
+    @Transactional
+    ResponseEntity<Void> addTeamMembers(@PathVariable Long id, TeamMembersDto dto) {
+        try {
+            Team team = getTeamById(id);
+            Iterable<User> users = findUsers(dto);
+
+            if (Iterables.size(users) != dto.getUserIds().size()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            users.forEach(user -> {
+                user.addToTeam(team);
+                team.addMember(user);
+            });
+
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (TeamNotFoundException exception) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    private Iterable<User> findUsers(TeamMembersDto dto) {
+        return userRepository.findAllById(dto.getUserIds());
     }
 
     @DeleteMapping("/{id}")

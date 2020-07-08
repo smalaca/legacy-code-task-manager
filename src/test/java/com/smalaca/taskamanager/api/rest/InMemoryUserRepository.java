@@ -8,7 +8,9 @@ import com.smalaca.taskamanager.domain.UserRepository;
 import org.apache.commons.lang3.RandomUtils;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -101,7 +103,15 @@ class InMemoryUserRepository implements UserRepository {
 
     @Override
     public Iterable<User> findAllById(Iterable<Long> ids) {
-        return null;
+        List<User> found = new ArrayList<>();
+
+        ids.forEach(id -> {
+            if (users.containsKey(id)) {
+                found.add(users.get(id));
+            }
+        });
+
+        return found;
     }
 
     @Override

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,6 +27,26 @@ class UserRepositoryTest {
         Optional<User> actual = repository.findByFirstNameAndLastName("Natasha", "Romanow");
 
         assertThat(actual.isEmpty()).isTrue();
+    }
+
+    @Test
+    void shouldFindUsersByIds() {
+        Long id1 = repository.save(user("Peter", "Parker")).getId();
+        repository.save(user("Tony", "Stark"));
+        Long id3 = repository.save(user("Steve", "Rogers")).getId();
+
+        Iterable<User> actual = repository.findAllById(asList(id1, id3, 13L));
+
+        assertThat(actual).hasSize(2)
+                .anySatisfy(isUser("Peter", "Parker"))
+                .anySatisfy(isUser("Steve", "Rogers"));
+    }
+
+    private Consumer<User> isUser(String firstName, String lastName) {
+        return actual -> {
+            assertThat(actual.getFirstName()).isEqualTo(firstName);
+            assertThat(actual.getLastName()).isEqualTo(lastName);
+        };
     }
 
     @Test
