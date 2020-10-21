@@ -3,6 +3,7 @@ package com.smalaca.taskamanager.api.rest;
 import com.google.common.collect.ImmutableList;
 import com.smalaca.taskamanager.domain.EmailAddress;
 import com.smalaca.taskamanager.domain.PhoneNumber;
+import com.smalaca.taskamanager.domain.TeamRole;
 import com.smalaca.taskamanager.domain.User;
 import com.smalaca.taskamanager.domain.UserRepository;
 import com.smalaca.taskamanager.dto.UserDto;
@@ -49,7 +50,8 @@ class UserControllerMockTest {
     private static final String EMAIL_ADDRESS = "dummy@gmail.com";
     private static final String PHONE_PREFIX = "+48";
     private static final String PHONE_NUMBER = "123456789";
-    private static final String TEAM_ROLE = "BUSINESS_ANALYSIS";
+    private static final TeamRole TEAM_ROLE = BUSINESS_ANALYSIS;
+    private static final String TEAM_ROLE_AS_STRING = TEAM_ROLE.name();
     private static final User MOCKED_USER = aMockedUser();
     private static final UserDto MOCKED_USER_DTO = aMockedUserDto();
     private static final URI DUMMY_URI = URI.create("dummy/uri");
@@ -128,6 +130,7 @@ class UserControllerMockTest {
         then(repository).should().save(argumentCaptor.capture());
         User user = argumentCaptor.getValue();
         assertThat(user.getFirstName()).isEqualTo(FIRST_NAME);
+        assertThat(user.getTeamRole()).isEqualTo(TEAM_ROLE);
         assertThat(user.getLastName()).isEqualTo(LAST_NAME);
         assertThat(user.getLogin()).isEqualTo(LOGIN);
         assertThat(user.getPassword()).isEqualTo(PASSWORD);
@@ -219,7 +222,7 @@ class UserControllerMockTest {
         given(user.getEmailAddress()).willReturn(EMAIL_ADDRESS);
         given(user.getPhonePrefix()).willReturn(PHONE_PREFIX);
         given(user.getPhoneNumber()).willReturn(PHONE_NUMBER);
-        given(user.getTeamRole()).willReturn(TEAM_ROLE);
+        given(user.getTeamRole()).willReturn(TEAM_ROLE_AS_STRING);
         return user;
     }
 }

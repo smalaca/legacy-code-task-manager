@@ -28,8 +28,9 @@ class UserControllerTest {
     private static final String LAST_NAME = "Banner";
     private static final String LOGIN = "bbanner";
     private static final String PASSWORD = "somethingExtremelyConfidential";
+    private static final String TEAM_ROLE = DEVELOPER.name();
 
-    private UserController controller = new UserController(new InMemoryUserRepository());
+    private final UserController controller = new UserController(new InMemoryUserRepository());
 
     @Test
     void shouldReturnAllUsers() {
@@ -97,6 +98,7 @@ class UserControllerTest {
         UserDto userDto = new UserDto();
         userDto.setFirstName(firstName);
         userDto.setLastName(lastName);
+        userDto.setTeamRole(TEAM_ROLE);
         return userDto;
     }
 
@@ -106,6 +108,7 @@ class UserControllerTest {
 
         assertThat(user.getFirstName()).isEqualTo(firstName);
         assertThat(user.getLastName()).isEqualTo(lastName);
+        assertThat(user.getTeamRole()).isEqualTo(TEAM_ROLE);
     }
 
     @Test
