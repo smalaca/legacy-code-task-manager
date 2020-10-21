@@ -21,8 +21,13 @@ class UserTest {
         user.setFirstName("Scott");
         user.setLastName("Lang");
         user.setTeamRole(TeamRole.DEVELOPER);
-        user.setPhoneNumber(new PhoneNumber("4NT", "421399999"));
-        user.setEmailAddress(new EmailAddress("antman@avengers.com"));
+        PhoneNumber phoneNumber = new PhoneNumber();
+        phoneNumber.setPrefix("4NT");
+        phoneNumber.setNumber("421399999");
+        user.setPhoneNumber(phoneNumber);
+        EmailAddress emailAddress = new EmailAddress();
+        emailAddress.setEmailAddress("antman@avengers.com");
+        user.setEmailAddress(emailAddress);
 
         assertThat(user.getId()).isNull();
         assertThat(user.getLogin()).isEqualTo("antman");
@@ -133,8 +138,13 @@ class UserTest {
         user.setLastName("Parker");
         user.setLogin("spiderman");
         user.setPassword("responsibility");
-        user.setEmailAddress(new EmailAddress("spider.in.the.web@gmail.com"));
-        user.setPhoneNumber(new PhoneNumber("000", "098765432"));
+        EmailAddress emailAddress = new EmailAddress();
+        emailAddress.setEmailAddress("spider.in.the.web@gmail.com");
+        user.setEmailAddress(emailAddress);
+        PhoneNumber phoneNumber = new PhoneNumber();
+        phoneNumber.setPrefix("000");
+        phoneNumber.setNumber("098765432");
+        user.setPhoneNumber(phoneNumber);
         user.setTeamRole(TeamRole.TESTER);
 
         return user;
@@ -146,8 +156,13 @@ class UserTest {
         user.setLastName("Maximoff");
         user.setLogin("Scarlet Witch");
         user.setPassword("qw3rty");
-        user.setEmailAddress(new EmailAddress("wanda@gmail.com"));
-        user.setPhoneNumber(new PhoneNumber("000", "123456789"));
+        EmailAddress emailAddress = new EmailAddress();
+        emailAddress.setEmailAddress("wanda@gmail.com");
+        user.setEmailAddress(emailAddress);
+        PhoneNumber phoneNumber = new PhoneNumber();
+        phoneNumber.setPrefix("000");
+        phoneNumber.setNumber("123456789");
+        user.setPhoneNumber(phoneNumber);
         user.setTeamRole(TeamRole.DEVELOPER);
 
         return user;

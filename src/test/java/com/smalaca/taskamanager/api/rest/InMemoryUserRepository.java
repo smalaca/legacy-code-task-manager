@@ -38,8 +38,13 @@ class InMemoryUserRepository implements UserRepository {
         user.setLogin(login);
         user.setPassword(DUMMY_PASSWORD);
         user.setTeamRole(teamRole);
-        user.setEmailAddress(new EmailAddress(emailAddress));
-        user.setPhoneNumber(new PhoneNumber("XYZ", phoneNumber));
+        EmailAddress email = new EmailAddress();
+        email.setEmailAddress(emailAddress);
+        user.setEmailAddress(email);
+        PhoneNumber number = new PhoneNumber();
+        number.setPrefix("XYZ");
+        number.setNumber(phoneNumber);
+        user.setPhoneNumber(number);
         setId(id, user);
 
         return user;

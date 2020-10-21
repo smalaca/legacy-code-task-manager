@@ -65,8 +65,13 @@ class UserRepositoryTest {
         user.setLastName(lastName);
         user.setLogin("login");
         user.setPassword("password");
-        user.setEmailAddress(new EmailAddress("dummy@gmail.com"));
-        user.setPhoneNumber(new PhoneNumber("+48", "123456789"));
+        EmailAddress emailAddress = new EmailAddress();
+        emailAddress.setEmailAddress("dummy@gmail.com");
+        user.setEmailAddress(emailAddress);
+        PhoneNumber phoneNumber = new PhoneNumber();
+        phoneNumber.setPrefix("+48");
+        phoneNumber.setNumber("123456789");
+        user.setPhoneNumber(phoneNumber);
 
         return user;
     }

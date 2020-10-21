@@ -9,9 +9,7 @@ import javax.persistence.Embeddable;
 public class EmailAddress {
     private String emailAddress;
 
-    private EmailAddress() {}
-
-    public EmailAddress(String emailAddress) {
+    public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
     }
 
