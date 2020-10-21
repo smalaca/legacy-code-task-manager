@@ -21,11 +21,12 @@ class TeamRepositoryTest {
 
     @Test
     void shouldChangeNameOfSpecificTeam() {
-        Team saved = teamRepository.save(new Team("Fantastic Four"));
+        Team saved = teamRepository.save(team("Fantastic Four"));
+        String name = "Champions";
         teamRepository.saveAll(asList(
-                new Team("Avengers"),
-                new Team("X-Men"),
-                new Team("Champions")
+                team("Avengers"),
+                team("X-Men"),
+                team(name)
         ));
         Team found = teamRepository.findById(saved.getId()).get();
         found.setName("FF");
@@ -43,14 +44,20 @@ class TeamRepositoryTest {
     @Test
     void shouldFindTeamByName() {
         teamRepository.saveAll(asList(
-                new Team("Avengers"),
-                new Team("X-Men"),
-                new Team("Champions")
+                team("Avengers"),
+                team("X-Men"),
+                team("Champions")
         ));
 
         Team actual = teamRepository.findByName("X-Men").get();
 
         assertThat(actual.getName()).isEqualTo("X-Men");
+    }
+
+    private Team team(String name) {
+        Team team = new Team();
+        team.setName(name);
+        return team;
     }
 
     private Predicate<Team> hasNameEqualTo(String name) {

@@ -14,7 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class TeamTest {
     @Test
     void shouldCreateTeam() {
-        Team actual = new Team("Avengers");
+        Team actual = new Team();
+        actual.setName("Avengers");
 
         assertThat(actual.getName()).isEqualTo("Avengers");
         assertThat(actual.getId()).isNull();
@@ -22,7 +23,7 @@ class TeamTest {
 
     @Test
     void shouldCreateTeamWithMembers() {
-        Team team = new Team("Avengers");
+        Team team = new Team();
 
         team.setMembers(asList(user("Tony", "Stark"), user("Steve", "Rogers"), user("Thor", "Odison")));
 
@@ -31,7 +32,7 @@ class TeamTest {
 
     @Test
     void shouldRemoveTeamMemberFromTeam() {
-        Team team = new Team("Avengers");
+        Team team = new Team();
         team.setMembers(asList(user("Tony", "Stark"), user("Steve", "Rogers"), user("Thor", "Odison")));
 
         team.removeMember(user("Steve", "Rogers"));
@@ -41,7 +42,7 @@ class TeamTest {
 
     @Test
     void shouldRecognizeWhenRemovingNotMemberOfTeam() {
-        Team team = new Team("Avengers");
+        Team team = new Team();
         team.setMembers(asList(user("Tony", "Stark"), user("Steve", "Rogers")));
 
         assertThrows(RuntimeException.class, () -> team.removeMember(user("Thor", "Odison")));
@@ -51,15 +52,15 @@ class TeamTest {
 
     @Test
     void shouldBeEqual() {
-        Team actual = team();
+        Team actual = new Team();
 
-        assertThat(actual.equals(team())).isTrue();
-        assertThat(actual.hashCode()).isEqualTo(team().hashCode());
+        assertThat(actual.equals(new Team())).isTrue();
+        assertThat(actual.hashCode()).isEqualTo(new Team().hashCode());
     }
 
     @Test
     void shouldBeEqualWithItself() {
-        Team actual = team();
+        Team actual = new Team();
 
         assertThat(actual.equals(actual)).isTrue();
         assertThat(actual.hashCode()).isEqualTo(actual.hashCode());
@@ -67,11 +68,11 @@ class TeamTest {
 
     @Test
     void shouldBeEqualToTeamWithDifferentTeamMembers() {
-        Team expected = team();
+        Team expected = new Team();
         expected.addMember(user("Scott", "Summers"));
         expected.addMember(user("Jean", "Grey"));
 
-        Team actual = team();
+        Team actual = new Team();
         actual.addMember(user("Peter", "Parker"));
 
         assertThat(actual.equals(expected)).isTrue();
@@ -80,24 +81,23 @@ class TeamTest {
 
     @Test
     void shouldNotBeEqualToNull() {
-        assertThat(team().equals(null)).isFalse();
+        assertThat(new Team().equals(null)).isFalse();
     }
 
     @ParameterizedTest
     @MethodSource("notEqualTeams")
     void shouldNotBeEqual(Object team) {
-        Team actual = team();
+        Team actual = new Team();
 
         assertThat(actual.equals(team)).isFalse();
         assertThat(actual.hashCode()).isNotEqualTo(team.hashCode());
     }
 
     private static List<Object> notEqualTeams() {
-        return asList(new Team("X-Men"), BigDecimal.valueOf(13));
-    }
+        Team team = new Team();
+        team.setName("X-Men");
 
-    private Team team() {
-        return new Team("Avengers");
+        return asList(team, BigDecimal.valueOf(13));
     }
 
     private User user(String firstName, String lastName) {

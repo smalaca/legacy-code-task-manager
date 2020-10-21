@@ -20,10 +20,10 @@ class UserTeamRelationTest {
     @BeforeEach
     void setUp() {
         teamRepository.saveAll(asList(
-                new Team("Avengers"),
-                new Team("Fantastic Four"),
-                new Team("X-Men"),
-                new Team("Champions")
+                team("Avengers"),
+                team("Fantastic Four"),
+                team("X-Men"),
+                team("Champions")
         ));
 
         userRepository.saveAll(asList(
@@ -35,6 +35,12 @@ class UserTeamRelationTest {
                 user("Gwen", "Stacy"),
                 user("Miles", "Morales")
         ));
+    }
+
+    private Team team(String name) {
+        Team team = new Team();
+        team.setName(name);
+        return team;
     }
 
     @AfterEach
