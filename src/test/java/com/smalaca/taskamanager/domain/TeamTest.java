@@ -87,6 +87,13 @@ class TeamTest {
         assertThat(actual.hashCode()).isEqualTo(expected.hashCode());
     }
 
+    private User user(String firstName, String lastName) {
+        User user = new User();
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        return user;
+    }
+
     @Test
     void shouldNotBeEqualToNull() {
         assertThat(new Team().equals(null)).isFalse();
@@ -96,22 +103,24 @@ class TeamTest {
     @MethodSource("notEqualTeams")
     void shouldNotBeEqual(Object team) {
         Team actual = new Team();
+        actual.setName("Dream Team");
 
         assertThat(actual.equals(team)).isFalse();
         assertThat(actual.hashCode()).isNotEqualTo(team.hashCode());
     }
 
     private static List<Object> notEqualTeams() {
-        Team team = new Team();
-        team.setName("X-Men");
-
-        return asList(team, BigDecimal.valueOf(13));
+        return asList(differentTeam(), new Team(), BigDecimal.valueOf(13));
     }
 
-    private User user(String firstName, String lastName) {
-        User user = new User();
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        return user;
+    private static Team differentTeam() {
+        Team team = new Team();
+        team.setName("X-Men");
+        Codename codename = new Codename();
+        codename.setShortName("X");
+        codename.setFullName("XM");
+        team.setCodename(codename);
+        team.setDescription("Mutants");
+        return team;
     }
 }

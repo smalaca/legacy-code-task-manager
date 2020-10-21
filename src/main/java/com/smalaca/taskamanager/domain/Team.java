@@ -89,6 +89,8 @@ public class Team {
         return new EqualsBuilder()
                 .append(id, team.id)
                 .append(name, team.name)
+                .append(codename, team.codename)
+                .append(description, team.description)
                 .isEquals();
     }
 
@@ -98,6 +100,8 @@ public class Team {
         return new HashCodeBuilder(17, 37)
                 .append(id)
                 .append(name)
+                .append(codename)
+                .append(description)
                 .toHashCode();
     }
 }
