@@ -32,6 +32,7 @@ import static java.util.stream.Collectors.toList;
 
 @RestController
 @RequestMapping("/team")
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class TeamController {
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
