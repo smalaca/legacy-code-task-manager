@@ -3,6 +3,7 @@ package com.smalaca.taskamanager.domain;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -17,6 +18,11 @@ public class Team {
     private Long id;
 
     private String name;
+
+    @Embedded
+    private Codename codename;
+
+    private String description;
 
     @OneToMany
     private List<User> members = new ArrayList<>();
@@ -52,6 +58,22 @@ public class Team {
         members.remove(user);
     }
 
+    public Codename getCodename() {
+        return codename;
+    }
+
+    public void setCodename(Codename codename) {
+        this.codename = codename;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -67,6 +89,8 @@ public class Team {
         return new EqualsBuilder()
                 .append(id, team.id)
                 .append(name, team.name)
+                .append(codename, team.codename)
+                .append(description, team.description)
                 .isEquals();
     }
 
@@ -76,6 +100,8 @@ public class Team {
         return new HashCodeBuilder(17, 37)
                 .append(id)
                 .append(name)
+                .append(codename)
+                .append(description)
                 .toHashCode();
     }
 }
