@@ -23,7 +23,8 @@ class InMemoryTeamRepository implements TeamRepository {
     }
 
     private Team createTeam(long id, String name) {
-        Team team = new Team(name);
+        Team team = new Team();
+        team.setName(name);
         setId(id, team);
         return team;
     }

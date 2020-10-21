@@ -21,12 +21,6 @@ public class Team {
     @OneToMany
     private List<User> members = new ArrayList<>();
 
-    private Team() {}
-
-    public Team(String name) {
-        this.name = name;
-    }
-
     public String getName() {
         return name;
     }

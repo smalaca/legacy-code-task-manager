@@ -37,9 +37,9 @@ class UserTest {
 
     @Test
     void shouldCreateUserWithTeams() {
-        Team team1 = new Team("Avengers");
-        Team team2 = new Team("X-Men");
-        Team team3 = new Team("X Force");
+        Team team1 = team("Avengers");
+        Team team2 = team("X-Men");
+        Team team3 = team("X Force");
         User user = new User();
 
         user.setTeams(asList(team1, team2, team3));
@@ -49,25 +49,25 @@ class UserTest {
 
     @Test
     void shouldRemoveUserFromTeam() {
-        Team team1 = new Team("Avengers");
-        Team team2 = new Team("X-Men");
-        Team team3 = new Team("X Force");
+        Team team1 = team("Avengers");
+        Team team2 = team("X-Men");
+        Team team3 = team("X Force");
         User user = new User();
         user.setTeams(asList(team1, team2, team3));
 
-        user.removeFrom(new Team("X Force"));
+        user.removeFrom(team("X Force"));
 
         assertThat(user.getTeams()).containsExactlyInAnyOrder(team1, team2);
     }
 
     @Test
     void shouldRecognizeWhenRemovingNotMemberOfTeam() {
-        Team team1 = new Team("Avengers");
-        Team team2 = new Team("X-Men");
+        Team team1 = team("Avengers");
+        Team team2 = team("X-Men");
         User user = new User();
         user.setTeams(asList(team1, team2));
 
-        assertThrows(RuntimeException.class, () -> user.removeFrom(new Team("X Force")));
+        assertThrows(RuntimeException.class, () -> user.removeFrom(team("X Force")));
 
         assertThat(user.getTeams()).containsExactlyInAnyOrder(team1, team2);
     }
@@ -91,14 +91,20 @@ class UserTest {
     @Test
     void shouldBeEqualToUserWithDifferentTeams() {
         User expected = user();
-        expected.addToTeam(new Team("Brotherhood of Mutants"));
-        expected.addToTeam(new Team("X-Men"));
+        expected.addToTeam(team("Brotherhood of Mutants"));
+        expected.addToTeam(team("X-Men"));
 
         User actual = user();
-        actual.addToTeam(new Team("Avengers"));
+        actual.addToTeam(team("Avengers"));
 
         assertThat(actual.equals(expected)).isTrue();
         assertThat(actual.hashCode()).isEqualTo(expected.hashCode());
+    }
+
+    private Team team(String name) {
+        Team team = new Team();
+        team.setName(name);
+        return team;
     }
 
     @Test
