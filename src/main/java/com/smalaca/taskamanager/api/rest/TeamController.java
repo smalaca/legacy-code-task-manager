@@ -57,7 +57,6 @@ public class TeamController {
                     }
 
                     dto.setDescription(team.getDescription());
-                    dto.setUserIds(team.getMembers().stream().map(User::getId).collect(toList()));
 
                     return dto;
                 })
