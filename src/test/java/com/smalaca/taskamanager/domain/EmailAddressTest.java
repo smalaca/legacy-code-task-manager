@@ -15,7 +15,8 @@ class EmailAddressTest {
     void shouldCreateEmailAddress() {
         String emailAddress = "dummy@fake.domain.com";
 
-        EmailAddress actual = new EmailAddress(emailAddress);
+        EmailAddress actual = new EmailAddress();
+        actual.setEmailAddress(emailAddress);
 
         assertThat(actual.getEmailAddress()).isEqualTo(emailAddress);
     }
@@ -51,10 +52,15 @@ class EmailAddressTest {
     }
 
     private static List<Object> notEqualEmailAddresses() {
-        return asList(new EmailAddress("natasha.romanov@avengers.com"), BigDecimal.valueOf(13));
+        EmailAddress emailAddress = new EmailAddress();
+        emailAddress.setEmailAddress("natasha.romanov@avengers.com");
+
+        return asList(emailAddress, BigDecimal.valueOf(13));
     }
 
     private EmailAddress emailAddress() {
-        return new EmailAddress("tony.stark@avengers.com");
+        EmailAddress emailAddress = new EmailAddress();
+        emailAddress.setEmailAddress("tony.stark@avengers.com");
+        return emailAddress;
     }
 }

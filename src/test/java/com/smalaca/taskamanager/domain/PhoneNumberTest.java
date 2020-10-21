@@ -19,7 +19,9 @@ class PhoneNumberTest {
         String prefix = "+48";
         String number = "123456789";
 
-        PhoneNumber actual = new PhoneNumber(prefix, number);
+        PhoneNumber actual = new PhoneNumber();
+        actual.setPrefix(prefix);
+        actual.setNumber(number);
 
         assertThat(actual.getPrefix()).isEqualTo(prefix);
         assertThat(actual.getNumber()).isEqualTo(number);
@@ -56,10 +58,17 @@ class PhoneNumberTest {
     }
 
     private static List<Object> notEqualPhoneNumbers() {
-        return asList(new PhoneNumber(PHONE_PREFIX, "123123213"), new PhoneNumber("898", PHONE_NUMBER), BigDecimal.valueOf(13));
+        return asList(phoneNumber(PHONE_PREFIX, "123123213"), phoneNumber("898", PHONE_NUMBER), BigDecimal.valueOf(13));
     }
 
     private PhoneNumber phoneNumber() {
-        return new PhoneNumber(PHONE_PREFIX, PHONE_NUMBER);
+        return phoneNumber(PHONE_PREFIX, PHONE_NUMBER);
+    }
+
+    private static PhoneNumber phoneNumber(String prefix, String number) {
+        PhoneNumber phoneNumber = new PhoneNumber();
+        phoneNumber.setPrefix(prefix);
+        phoneNumber.setNumber(number);
+        return phoneNumber;
     }
 }

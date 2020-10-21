@@ -14,19 +14,20 @@ public class PhoneNumber {
     @Column(name = "phone_number")
     private String number;
 
-    private PhoneNumber() {}
-
-    public PhoneNumber(String prefix, String number) {
-        this.prefix = prefix;
-        this.number = number;
-    }
-
     public String getPrefix() {
         return prefix;
     }
 
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
     public String getNumber() {
         return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
     }
 
     @Override

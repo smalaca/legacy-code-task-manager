@@ -146,11 +146,16 @@ public class UserController {
         }
 
         if (userDto.getPhoneNumber() != null) {
-            user.setPhoneNumber(new PhoneNumber(userDto.getPhonePrefix(), userDto.getPhoneNumber()));
+            PhoneNumber phoneNumber = new PhoneNumber();
+            phoneNumber.setPrefix(userDto.getPhonePrefix());
+            phoneNumber.setNumber(userDto.getPhoneNumber());
+            user.setPhoneNumber(phoneNumber);
         }
 
         if (userDto.getEmailAddress() != null) {
-            user.setEmailAddress(new EmailAddress(userDto.getEmailAddress()));
+            EmailAddress emailAddress = new EmailAddress();
+            emailAddress.setEmailAddress(userDto.getEmailAddress());
+            user.setEmailAddress(emailAddress);
         }
 
         if (userDto.getTeamRole() != null) {
