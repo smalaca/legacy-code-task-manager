@@ -2,6 +2,7 @@ package com.smalaca.taskamanager.api.rest;
 
 
 import com.google.common.collect.Iterables;
+import com.smalaca.taskamanager.domain.Codename;
 import com.smalaca.taskamanager.domain.Team;
 import com.smalaca.taskamanager.domain.TeamRepository;
 import com.smalaca.taskamanager.domain.User;
@@ -41,12 +42,22 @@ public class TeamController {
     }
 
     @GetMapping
+    @Transactional
     public ResponseEntity<List<TeamDto>> findAll() {
         List<TeamDto> teams = StreamSupport.stream(teamRepository.findAll().spliterator(), false)
                 .map(team -> {
                     TeamDto dto = new TeamDto();
                     dto.setId(team.getId());
                     dto.setName(team.getName());
+
+                    if (team.getCodename() != null) {
+                        dto.setCodenameShort(team.getCodename().getShortName());
+                        dto.setCodenameFull(team.getCodename().getFullName());
+                    }
+
+                    dto.setDescription(team.getDescription());
+                    dto.setUserIds(team.getMembers().stream().map(User::getId).collect(toList()));
+
                     return dto;
                 })
                 .collect(toList());
@@ -62,6 +73,13 @@ public class TeamController {
             TeamDto dto = new TeamDto();
             dto.setId(team.getId());
             dto.setName(team.getName());
+
+            if (team.getCodename() != null) {
+                dto.setCodenameShort(team.getCodename().getShortName());
+                dto.setCodenameFull(team.getCodename().getFullName());
+            }
+
+            dto.setDescription(team.getDescription());
             dto.setUserIds(team.getMembers().stream().map(User::getId).collect(toList()));
 
             return new ResponseEntity<>(dto, HttpStatus.OK);
@@ -99,11 +117,28 @@ public class TeamController {
             team.setName(teamDto.getName());
         }
 
+        if (teamDto.getCodenameShort() != null && teamDto.getCodenameFull() != null) {
+            Codename codename = new Codename();
+            codename.setShortName(teamDto.getCodenameShort());
+            codename.setFullName(teamDto.getCodenameFull());
+            team.setCodename(codename);
+        }
+
+        if (teamDto.getDescription() != null) {
+            team.setDescription(teamDto.getDescription());
+        }
+
         Team updated = teamRepository.save(team);
 
         TeamDto dto = new TeamDto();
         dto.setId(updated.getId());
         dto.setName(updated.getName());
+        if (updated.getCodename() != null) {
+            dto.setCodenameShort(updated.getCodename().getShortName());
+            dto.setCodenameFull(updated.getCodename().getFullName());
+        }
+
+        dto.setDescription(updated.getDescription());
 
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }

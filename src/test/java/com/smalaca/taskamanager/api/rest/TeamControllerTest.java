@@ -37,16 +37,19 @@ class TeamControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(OK);
 
         assertThat(response.getBody()).hasSize(5)
-                .anySatisfy(dto -> assertTeam(dto, 1L, "Avengers"))
-                .anySatisfy(dto -> assertTeam(dto, 2L, "Fantastic Four"))
-                .anySatisfy(dto -> assertTeam(dto, 3L, "X-Men"))
-                .anySatisfy(dto -> assertTeam(dto, 4L, "X Force"))
-                .anySatisfy(dto -> assertTeam(dto, 5L, "Champions"));
+                .anySatisfy(dto -> assertTeam(dto, 1L, "Avengers", "A", "Mighty Avengers", "the greatest team on Earth"))
+                .anySatisfy(dto -> assertTeam(dto, 2L, "Fantastic Four", "FF", "F4", "created with an accident"))
+                .anySatisfy(dto -> assertTeam(dto, 3L, "X-Men", "X", "XMen", "Mutants"))
+                .anySatisfy(dto -> assertTeam(dto, 4L, "X Force", "X", "XF", "They are the best in what they do"))
+                .anySatisfy(dto -> assertTeam(dto, 5L, "Champions", "CH", "CH", "New heroes in town"));
     }
 
-    private void assertTeam(TeamDto dto, long id, String name) {
+    private void assertTeam(TeamDto dto, long id, String name, String codenameShort, String codenameFull, String description) {
         assertThat(dto.getId()).isEqualTo(id);
         assertThat(dto.getName()).isEqualTo(name);
+        assertThat(dto.getCodenameShort()).isEqualTo(codenameShort);
+        assertThat(dto.getCodenameFull()).isEqualTo(codenameFull);
+        assertThat(dto.getDescription()).isEqualTo(description);
     }
 
     @Test
@@ -114,13 +117,22 @@ class TeamControllerTest {
         assertThat(teamDto.getId()).isEqualTo(EXISTING_TEAM_ID);
         assertThat(teamDto.getName()).isEqualTo(EXISTING_TEAM_NAME);
         assertThat(teamDto.getUserIds()).isEmpty();
+        assertThat(teamDto.getCodenameShort()).isEqualTo("A");
+        assertThat(teamDto.getCodenameFull()).isEqualTo("Mighty Avengers");
+        assertThat(teamDto.getDescription()).isEqualTo("the greatest team on Earth");
     }
 
     @Test
     void shouldUpdateAboutSuccessIfUpdatingExistingTeam() {
         String newName = randomString();
+        String newCodenameShort = randomString();
+        String newCodenameFull = randomString();
+        String newDescription = randomString();
         TeamDto dto = new TeamDto();
         dto.setName(newName);
+        dto.setCodenameShort(newCodenameShort);
+        dto.setCodenameFull(newCodenameFull);
+        dto.setDescription(newDescription);
 
         ResponseEntity<TeamDto> response = controller.updateTeam(EXISTING_TEAM_ID, dto);
 
@@ -128,8 +140,14 @@ class TeamControllerTest {
         TeamDto actualDto = response.getBody();
         assertThat(actualDto.getId()).isEqualTo(EXISTING_TEAM_ID);
         assertThat(actualDto.getName()).isEqualTo(newName);
+        assertThat(actualDto.getCodenameShort()).isEqualTo(newCodenameShort);
+        assertThat(actualDto.getCodenameFull()).isEqualTo(newCodenameFull);
+        assertThat(actualDto.getDescription()).isEqualTo(newDescription);
         TeamDto updated = controller.findById(EXISTING_TEAM_ID).getBody();
         assertThat(updated.getName()).isEqualTo(newName);
+        assertThat(updated.getCodenameShort()).isEqualTo(newCodenameShort);
+        assertThat(updated.getCodenameFull()).isEqualTo(newCodenameFull);
+        assertThat(updated.getDescription()).isEqualTo(newDescription);
     }
 
     private String randomString() {

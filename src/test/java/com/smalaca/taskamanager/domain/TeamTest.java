@@ -16,8 +16,16 @@ class TeamTest {
     void shouldCreateTeam() {
         Team actual = new Team();
         actual.setName("Avengers");
+        Codename codename = new Codename();
+        codename.setShortName("A");
+        codename.setFullName("Mighty Avengers");
+        actual.setCodename(codename);
+        actual.setDescription("Some fancy description");
 
         assertThat(actual.getName()).isEqualTo("Avengers");
+        assertThat(actual.getCodename().getShortName()).isEqualTo("A");
+        assertThat(actual.getCodename().getFullName()).isEqualTo("Mighty Avengers");
+        assertThat(actual.getDescription()).isEqualTo("Some fancy description");
         assertThat(actual.getId()).isNull();
     }
 

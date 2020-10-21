@@ -1,5 +1,6 @@
 package com.smalaca.taskamanager.api.rest;
 
+import com.smalaca.taskamanager.domain.Codename;
 import com.smalaca.taskamanager.domain.Team;
 import com.smalaca.taskamanager.domain.TeamRepository;
 import org.apache.commons.lang3.RandomUtils;
@@ -15,16 +16,21 @@ class InMemoryTeamRepository implements TeamRepository {
     private final Map<Long, Team> teams = new HashMap<>();
 
     public InMemoryTeamRepository() {
-        teams.put(1L, createTeam(1L, "Avengers"));
-        teams.put(2L, createTeam(2L, "Fantastic Four"));
-        teams.put(3L, createTeam(3L, "X-Men"));
-        teams.put(4L, createTeam(4L, "X Force"));
-        teams.put(5L, createTeam(5L, "Champions"));
+        teams.put(1L, createTeam(1L, "Avengers", "A", "Mighty Avengers", "the greatest team on Earth"));
+        teams.put(2L, createTeam(2L, "Fantastic Four", "FF", "F4", "created with an accident"));
+        teams.put(3L, createTeam(3L, "X-Men", "X", "XMen", "Mutants"));
+        teams.put(4L, createTeam(4L, "X Force", "X", "XF", "They are the best in what they do"));
+        teams.put(5L, createTeam(5L, "Champions", "CH", "CH", "New heroes in town"));
     }
 
-    private Team createTeam(long id, String name) {
+    private Team createTeam(long id, String name, String codenameShort, String codenameFull, String description) {
         Team team = new Team();
         team.setName(name);
+        Codename codename = new Codename();
+        codename.setShortName(codenameShort);
+        codename.setFullName(codenameFull);
+        team.setCodename(codename);
+        team.setDescription(description);
         setId(id, team);
         return team;
     }
