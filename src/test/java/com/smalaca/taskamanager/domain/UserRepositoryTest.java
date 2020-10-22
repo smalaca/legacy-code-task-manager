@@ -1,5 +1,6 @@
 package com.smalaca.taskamanager.domain;
 
+import com.smalaca.taskamanager.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
