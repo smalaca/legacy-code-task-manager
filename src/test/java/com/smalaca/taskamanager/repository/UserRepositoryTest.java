@@ -1,6 +1,8 @@
-package com.smalaca.taskamanager.domain;
+package com.smalaca.taskamanager.repository;
 
-import com.smalaca.taskamanager.repository.UserRepository;
+import com.smalaca.taskamanager.domain.EmailAddress;
+import com.smalaca.taskamanager.domain.PhoneNumber;
+import com.smalaca.taskamanager.domain.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
