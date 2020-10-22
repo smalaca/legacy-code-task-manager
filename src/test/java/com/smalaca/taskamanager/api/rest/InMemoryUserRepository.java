@@ -4,7 +4,7 @@ import com.smalaca.taskamanager.domain.EmailAddress;
 import com.smalaca.taskamanager.domain.PhoneNumber;
 import com.smalaca.taskamanager.domain.TeamRole;
 import com.smalaca.taskamanager.domain.User;
-import com.smalaca.taskamanager.domain.UserRepository;
+import com.smalaca.taskamanager.repository.UserRepository;
 import org.apache.commons.lang3.RandomUtils;
 
 import java.lang.reflect.Field;

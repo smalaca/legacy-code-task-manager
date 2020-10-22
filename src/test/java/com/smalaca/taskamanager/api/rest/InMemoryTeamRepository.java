@@ -2,7 +2,7 @@ package com.smalaca.taskamanager.api.rest;
 
 import com.smalaca.taskamanager.domain.Codename;
 import com.smalaca.taskamanager.domain.Team;
-import com.smalaca.taskamanager.domain.TeamRepository;
+import com.smalaca.taskamanager.repository.TeamRepository;
 import org.apache.commons.lang3.RandomUtils;
 
 import java.lang.reflect.Field;
