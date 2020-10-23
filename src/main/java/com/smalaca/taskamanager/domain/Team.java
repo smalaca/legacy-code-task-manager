@@ -7,6 +7,7 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,9 @@ public class Team {
 
     @OneToMany
     private List<User> members = new ArrayList<>();
+
+    @ManyToOne
+    private Project project;
 
     public String getName() {
         return name;
@@ -72,6 +76,14 @@ public class Team {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 
     @Override

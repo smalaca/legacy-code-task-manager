@@ -4,6 +4,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.smalaca.taskamanager.domain.ProjectStatus.IDEA;
 
@@ -19,6 +22,9 @@ public class Project {
 
     @ManyToOne
     private ProductOwner productOwner;
+
+    @OneToMany
+    private List<Team> teams = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -46,5 +52,17 @@ public class Project {
 
     public void setProductOwner(ProductOwner productOwner) {
         this.productOwner = productOwner;
+    }
+
+    public List<Team> getTeams() {
+        return teams;
+    }
+
+    public void setTeams(List<Team> teams) {
+        this.teams = teams;
+    }
+
+    public void addTeam(Team team) {
+        teams.add(team);
     }
 }
