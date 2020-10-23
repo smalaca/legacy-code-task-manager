@@ -83,6 +83,9 @@ class UserTeamRelationTest {
         xMen.addMember(charlesXavier);
         charlesXavier.addToTeam(xMen);
 
+        teamRepository.saveAll(asList(avengers, fantasticFour, xMen));
+        userRepository.saveAll(asList(readRichard, sueStorm, charlesXavier, peterParker, tonyStark));
+
         assertThat(findTeamBy("Avengers").getMembers()).hasSize(2)
                 .anyMatch(isUser("Tony", "Stark"))
                 .anyMatch(isUser("Peter", "Parker"));
