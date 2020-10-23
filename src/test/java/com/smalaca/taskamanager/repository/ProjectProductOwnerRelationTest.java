@@ -86,16 +86,14 @@ class ProjectProductOwnerRelationTest {
 
         avengersVsXmen.setProductOwner(gwenStacy);
         secretWars.setProductOwner(gwenStacy);
-        gwenStacy.addProject(avengersVsXmen);
-        gwenStacy.addProject(secretWars);
+        gwenStacy.setProjects(asList(avengersVsXmen, secretWars));
 
         civilWar.setProductOwner(milesMorales);
-        milesMorales.addProject(civilWar);
+        milesMorales.setProjects(asList(civilWar));
 
         phoenixSaga.setProductOwner(miguelOHara);
         thanosImperative.setProductOwner(miguelOHara);
-        miguelOHara.addProject(phoenixSaga);
-        miguelOHara.addProject(thanosImperative);
+        miguelOHara.setProjects(asList(phoenixSaga, thanosImperative));
 
         projectRepository.saveAll(asList(avengersVsXmen, secretWars, civilWar, phoenixSaga, thanosImperative));
         productOwnerRepository.saveAll(asList(gwenStacy, milesMorales, miguelOHara));
@@ -125,5 +123,4 @@ class ProjectProductOwnerRelationTest {
     private ProductOwner findProductOwnerByName(String firstName, String lastName) {
         return productOwnerRepository.findById(productOwners.get(firstName + lastName)).get();
     }
-
 }
