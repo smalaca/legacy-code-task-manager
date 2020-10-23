@@ -4,6 +4,9 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class ProductOwner {
@@ -19,6 +22,9 @@ public class ProductOwner {
 
     @Embedded
     private EmailAddress emailAddress;
+
+    @OneToMany
+    private List<Project> projects = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -54,5 +60,17 @@ public class ProductOwner {
 
     public void setEmailAddress(EmailAddress emailAddress) {
         this.emailAddress = emailAddress;
+    }
+
+    public List<Project> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(List<Project> projects) {
+        this.projects = projects;
+    }
+
+    public void addProject(Project project) {
+        projects.add(project);
     }
 }
