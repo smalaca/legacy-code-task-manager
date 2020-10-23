@@ -86,14 +86,16 @@ class ProjectProductOwnerRelationTest {
 
         avengersVsXmen.setProductOwner(gwenStacy);
         secretWars.setProductOwner(gwenStacy);
-        gwenStacy.setProjects(asList(avengersVsXmen, secretWars));
+        gwenStacy.addProject(avengersVsXmen);
+        gwenStacy.addProject(secretWars);
 
         civilWar.setProductOwner(milesMorales);
-        milesMorales.setProjects(asList(civilWar));
+        milesMorales.addProject(civilWar);
 
         phoenixSaga.setProductOwner(miguelOHara);
         thanosImperative.setProductOwner(miguelOHara);
-        miguelOHara.setProjects(asList(phoenixSaga, thanosImperative));
+        miguelOHara.addProject(phoenixSaga);
+        miguelOHara.addProject(thanosImperative);
 
         projectRepository.saveAll(asList(avengersVsXmen, secretWars, civilWar, phoenixSaga, thanosImperative));
         productOwnerRepository.saveAll(asList(gwenStacy, milesMorales, miguelOHara));
