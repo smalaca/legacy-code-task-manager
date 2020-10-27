@@ -69,4 +69,12 @@ public class ProductOwner {
     public void addProject(Project project) {
         projects.add(project);
     }
+
+    public void removeProject(Project project) {
+        if (projects.contains(project)) {
+            projects.remove(project);
+        } else {
+            throw new RuntimeException();
+        }
+    }
 }

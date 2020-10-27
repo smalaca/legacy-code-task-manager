@@ -1,5 +1,8 @@
 package com.smalaca.taskamanager.domain;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -60,5 +63,32 @@ public class Project {
 
     public void addTeam(Team team) {
         teams.add(team);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Project project = (Project) o;
+
+        return new EqualsBuilder()
+                .append(id, project.id)
+                .append(name, project.name)
+                .isEquals();
+    }
+
+    @Override
+    @SuppressWarnings("MagicNumber")
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(id)
+                .append(name)
+                .toHashCode();
     }
 }
