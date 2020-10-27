@@ -159,6 +159,9 @@ public class TeamController {
                 team.addMember(user);
             });
 
+            teamRepository.save(team);
+            userRepository.saveAll(users);
+
             return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (TeamNotFoundException exception) {
@@ -179,6 +182,9 @@ public class TeamController {
                     team.removeMember(user);
                 }
             });
+
+            teamRepository.save(team);
+            userRepository.saveAll(users);
 
             return new ResponseEntity<>(HttpStatus.OK);
 
