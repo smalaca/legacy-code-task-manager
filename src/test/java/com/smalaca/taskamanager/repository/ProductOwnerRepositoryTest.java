@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -51,6 +52,22 @@ class ProductOwnerRepositoryTest {
 
         assertThat(actual.getFirstName()).isEqualTo("Wanda");
         assertThat(actual.getLastName()).isEqualTo("Maximoff");
+    }
+
+    @Test
+    void shouldFindByFirstAndLastName() {
+        repository.saveAll(asList(
+                productOwner("Steve", "Rogers"),
+                productOwner("Steve", "Strange"),
+                productOwner("Sarah", "Rogers"),
+                productOwner("Wanda", "Maximoff"),
+                productOwner("Kitty", "Pryde")
+        ));
+
+        ProductOwner actual = repository.findByFirstNameAndLastName("Sarah", "Rogers").get();
+
+        assertThat(actual.getFirstName()).isEqualTo("Sarah");
+        assertThat(actual.getLastName()).isEqualTo("Rogers");
     }
 
     private ProductOwner productOwner(String firstName, String lastName) {
