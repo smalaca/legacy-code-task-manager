@@ -124,7 +124,7 @@ class UserTeamRelationTest {
     }
 
     private User findUserBy(String firstName, String lastName) {
-        return userRepository.findByFirstNameAndLastName(firstName, lastName).get();
+        return userRepository.findByUserNameFirstNameAndUserNameLastName(firstName, lastName).get();
     }
 
     private Team findTeamBy(String name) {

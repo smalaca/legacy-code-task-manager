@@ -127,7 +127,7 @@ public class UserController {
     }
 
     private boolean exists(UserDto userDto) {
-        return !userRepository.findByFirstNameAndLastName(userDto.getFirstName(), userDto.getLastName()).isEmpty();
+        return !userRepository.findByUserNameFirstNameAndUserNameLastName(userDto.getFirstName(), userDto.getLastName()).isEmpty();
     }
 
     @PutMapping(value = "/{id}")

@@ -28,7 +28,7 @@ class UserRepositoryTest {
     void shouldFindNoUserWhenUserNotExist() {
         repository.saveAll(asList(user("Peter", "Parker"), user("Tony", "Stark"), user("Steve", "Rogers")));
 
-        Optional<User> actual = repository.findByFirstNameAndLastName("Natasha", "Romanow");
+        Optional<User> actual = repository.findByUserNameFirstNameAndUserNameLastName("Natasha", "Romanow");
 
         assertThat(actual.isEmpty()).isTrue();
     }
@@ -57,7 +57,7 @@ class UserRepositoryTest {
     void shouldFindUserByFirstAndLastName() {
         repository.saveAll(asList(user("Peter", "Parker"), user("Tony", "Stark"), user("Steve", "Rogers")));
 
-        User actual = repository.findByFirstNameAndLastName("Peter", "Parker").get();
+        User actual = repository.findByUserNameFirstNameAndUserNameLastName("Peter", "Parker").get();
 
         assertThat(actual.getUserName().getFirstName()).isEqualTo("Peter");
         assertThat(actual.getUserName().getLastName()).isEqualTo("Parker");

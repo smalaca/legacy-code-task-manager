@@ -101,7 +101,7 @@ class UserControllerMockTest {
 
     @Test
     void shouldInformAboutConflictWhenCreatedUserAlreadyExists() {
-        given(repository.findByFirstNameAndLastName(FIRST_NAME, LAST_NAME)).willReturn(Optional.of(MOCKED_USER));
+        given(repository.findByUserNameFirstNameAndUserNameLastName(FIRST_NAME, LAST_NAME)).willReturn(Optional.of(MOCKED_USER));
 
         ResponseEntity<Void> response = controller.createUser(MOCKED_USER_DTO, uriComponentsBuilder);
 
@@ -111,7 +111,7 @@ class UserControllerMockTest {
     @Test
     void shouldCreateUser() {
         ArgumentCaptor<User> argumentCaptor = ArgumentCaptor.forClass(User.class);
-        given(repository.findByFirstNameAndLastName(FIRST_NAME, LAST_NAME)).willReturn(Optional.empty());
+        given(repository.findByUserNameFirstNameAndUserNameLastName(FIRST_NAME, LAST_NAME)).willReturn(Optional.empty());
         given(repository.save(any())).willAnswer(invocationOnMock -> {
             User argument = invocationOnMock.getArgument(0);
             Field id = User.class.getDeclaredField("id");

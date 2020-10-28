@@ -80,7 +80,7 @@ class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByFirstNameAndLastName(String firstName, String lastName) {
+    public Optional<User> findByUserNameFirstNameAndUserNameLastName(String firstName, String lastName) {
         for (User user : findAll()) {
             if (user.getUserName().getFirstName().equals(firstName) && user.getUserName().getLastName().equals(lastName)) {
                 return Optional.of(user);
