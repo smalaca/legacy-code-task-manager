@@ -1,5 +1,6 @@
 package com.smalaca.taskamanager.repository;
 
+import com.smalaca.taskamanager.model.embedded.UserName;
 import com.smalaca.taskamanager.model.entities.Team;
 import com.smalaca.taskamanager.model.entities.User;
 import org.junit.jupiter.api.AfterEach;
@@ -53,8 +54,10 @@ class UserTeamRelationTest {
 
     private User user(String firstName, String lastName) {
         User user = new User();
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
+        UserName userName = new UserName();
+        userName.setFirstName(firstName);
+        userName.setLastName(lastName);
+        user.setUserName(userName);
         return user;
     }
 
@@ -117,11 +120,11 @@ class UserTeamRelationTest {
     }
 
     private Predicate<User> isUser(String firstName, String lastName) {
-        return user -> user.getFirstName().equals(firstName) && user.getLastName().equals(lastName);
+        return user -> user.getUserName().getFirstName().equals(firstName) && user.getUserName().getLastName().equals(lastName);
     }
 
     private User findUserBy(String firstName, String lastName) {
-        return userRepository.findByFirstNameAndLastName(firstName, lastName).get();
+        return userRepository.findByUserNameFirstNameAndUserNameLastName(firstName, lastName).get();
     }
 
     private Team findTeamBy(String name) {

@@ -4,6 +4,7 @@ import com.smalaca.taskamanager.dto.UserDto;
 import com.smalaca.taskamanager.exception.UserNotFoundException;
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
+import com.smalaca.taskamanager.model.embedded.UserName;
 import com.smalaca.taskamanager.model.entities.User;
 import com.smalaca.taskamanager.model.enums.TeamRole;
 import com.smalaca.taskamanager.repository.UserRepository;
@@ -27,6 +28,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class UserController {
     private final UserRepository userRepository;
 
@@ -42,8 +44,8 @@ public class UserController {
         for (User user : userRepository.findAll()) {
             UserDto userDto = new UserDto();
             userDto.setId(user.getId());
-            userDto.setFirstName(user.getFirstName());
-            userDto.setLastName(user.getLastName());
+            userDto.setFirstName(user.getUserName().getFirstName());
+            userDto.setLastName(user.getUserName().getLastName());
             userDto.setLogin(user.getLogin());
             userDto.setPassword(user.getPassword());
 
@@ -76,8 +78,8 @@ public class UserController {
 
             UserDto userDto = new UserDto();
             userDto.setId(user.getId());
-            userDto.setFirstName(user.getFirstName());
-            userDto.setLastName(user.getLastName());
+            userDto.setFirstName(user.getUserName().getFirstName());
+            userDto.setLastName(user.getUserName().getLastName());
             userDto.setLogin(user.getLogin());
             userDto.setPassword(user.getPassword());
 
@@ -110,8 +112,10 @@ public class UserController {
         } else {
             User user = new User();
             user.setTeamRole(TeamRole.valueOf(userDto.getTeamRole()));
-            user.setFirstName(userDto.getFirstName());
-            user.setLastName(userDto.getLastName());
+            UserName userName = new UserName();
+            userName.setFirstName(userDto.getFirstName());
+            userName.setLastName(userDto.getLastName());
+            user.setUserName(userName);
             user.setLogin(userDto.getLogin());
             user.setPassword(userDto.getPassword());
 
@@ -124,7 +128,7 @@ public class UserController {
     }
 
     private boolean exists(UserDto userDto) {
-        return !userRepository.findByFirstNameAndLastName(userDto.getFirstName(), userDto.getLastName()).isEmpty();
+        return !userRepository.findByUserNameFirstNameAndUserNameLastName(userDto.getFirstName(), userDto.getLastName()).isEmpty();
     }
 
     @PutMapping(value = "/{id}")
@@ -166,8 +170,8 @@ public class UserController {
 
         UserDto response = new UserDto();
         response.setId(updated.getId());
-        response.setFirstName(updated.getFirstName());
-        response.setLastName(updated.getLastName());
+        response.setFirstName(updated.getUserName().getFirstName());
+        response.setLastName(updated.getUserName().getLastName());
         response.setLogin(updated.getLogin());
         response.setPassword(updated.getPassword());
 

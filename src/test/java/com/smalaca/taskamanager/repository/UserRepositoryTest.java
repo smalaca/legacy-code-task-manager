@@ -2,6 +2,7 @@ package com.smalaca.taskamanager.repository;
 
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
+import com.smalaca.taskamanager.model.embedded.UserName;
 import com.smalaca.taskamanager.model.entities.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,7 @@ class UserRepositoryTest {
     void shouldFindNoUserWhenUserNotExist() {
         repository.saveAll(asList(user("Peter", "Parker"), user("Tony", "Stark"), user("Steve", "Rogers")));
 
-        Optional<User> actual = repository.findByFirstNameAndLastName("Natasha", "Romanow");
+        Optional<User> actual = repository.findByUserNameFirstNameAndUserNameLastName("Natasha", "Romanow");
 
         assertThat(actual.isEmpty()).isTrue();
     }
@@ -47,8 +48,8 @@ class UserRepositoryTest {
 
     private Consumer<User> isUser(String firstName, String lastName) {
         return actual -> {
-            assertThat(actual.getFirstName()).isEqualTo(firstName);
-            assertThat(actual.getLastName()).isEqualTo(lastName);
+            assertThat(actual.getUserName().getFirstName()).isEqualTo(firstName);
+            assertThat(actual.getUserName().getLastName()).isEqualTo(lastName);
         };
     }
 
@@ -56,16 +57,18 @@ class UserRepositoryTest {
     void shouldFindUserByFirstAndLastName() {
         repository.saveAll(asList(user("Peter", "Parker"), user("Tony", "Stark"), user("Steve", "Rogers")));
 
-        User actual = repository.findByFirstNameAndLastName("Peter", "Parker").get();
+        User actual = repository.findByUserNameFirstNameAndUserNameLastName("Peter", "Parker").get();
 
-        assertThat(actual.getFirstName()).isEqualTo("Peter");
-        assertThat(actual.getLastName()).isEqualTo("Parker");
+        assertThat(actual.getUserName().getFirstName()).isEqualTo("Peter");
+        assertThat(actual.getUserName().getLastName()).isEqualTo("Parker");
     }
 
     private User user(String firstName, String lastName) {
         User user = new User();
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
+        UserName userName = new UserName();
+        userName.setFirstName(firstName);
+        userName.setLastName(lastName);
+        user.setUserName(userName);
         user.setLogin("login");
         user.setPassword("password");
         EmailAddress emailAddress = new EmailAddress();

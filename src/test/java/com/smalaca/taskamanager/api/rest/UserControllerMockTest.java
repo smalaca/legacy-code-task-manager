@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.smalaca.taskamanager.dto.UserDto;
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
+import com.smalaca.taskamanager.model.embedded.UserName;
 import com.smalaca.taskamanager.model.entities.User;
 import com.smalaca.taskamanager.model.enums.TeamRole;
 import com.smalaca.taskamanager.repository.UserRepository;
@@ -37,8 +38,8 @@ import static org.springframework.http.HttpStatus.OK;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerMockTest {
-    private static final User DUMMY_USER_1 = mock(User.class);
-    private static final User DUMMY_USER_2 = mock(User.class);
+    private static final User DUMMY_USER_1 = dummyUser();
+    private static final User DUMMY_USER_2 = dummyUser();
     private static final List<User> DUMMY_USERS = ImmutableList.of(DUMMY_USER_1, DUMMY_USER_2);
     private static final Long EXISTING_USER_ID = 13L;
     private static final Long NOT_EXISTING_USER_ID = 69L;
@@ -101,7 +102,7 @@ class UserControllerMockTest {
 
     @Test
     void shouldInformAboutConflictWhenCreatedUserAlreadyExists() {
-        given(repository.findByFirstNameAndLastName(FIRST_NAME, LAST_NAME)).willReturn(Optional.of(MOCKED_USER));
+        given(repository.findByUserNameFirstNameAndUserNameLastName(FIRST_NAME, LAST_NAME)).willReturn(Optional.of(MOCKED_USER));
 
         ResponseEntity<Void> response = controller.createUser(MOCKED_USER_DTO, uriComponentsBuilder);
 
@@ -111,7 +112,7 @@ class UserControllerMockTest {
     @Test
     void shouldCreateUser() {
         ArgumentCaptor<User> argumentCaptor = ArgumentCaptor.forClass(User.class);
-        given(repository.findByFirstNameAndLastName(FIRST_NAME, LAST_NAME)).willReturn(Optional.empty());
+        given(repository.findByUserNameFirstNameAndUserNameLastName(FIRST_NAME, LAST_NAME)).willReturn(Optional.empty());
         given(repository.save(any())).willAnswer(invocationOnMock -> {
             User argument = invocationOnMock.getArgument(0);
             Field id = User.class.getDeclaredField("id");
@@ -129,9 +130,9 @@ class UserControllerMockTest {
         assertThat(response.getHeaders().getLocation().normalize()).isEqualTo(DUMMY_URI);
         then(repository).should().save(argumentCaptor.capture());
         User user = argumentCaptor.getValue();
-        assertThat(user.getFirstName()).isEqualTo(FIRST_NAME);
+        assertThat(user.getUserName().getFirstName()).isEqualTo(FIRST_NAME);
         assertThat(user.getTeamRole()).isEqualTo(TEAM_ROLE);
-        assertThat(user.getLastName()).isEqualTo(LAST_NAME);
+        assertThat(user.getUserName().getLastName()).isEqualTo(LAST_NAME);
         assertThat(user.getLogin()).isEqualTo(LOGIN);
         assertThat(user.getPassword()).isEqualTo(PASSWORD);
     }
@@ -205,11 +206,25 @@ class UserControllerMockTest {
     private static User aMockedUser() {
         User user = mock(User.class);
         given(user.getId()).willReturn(EXISTING_USER_ID);
-        given(user.getFirstName()).willReturn(FIRST_NAME);
-        given(user.getLastName()).willReturn(LAST_NAME);
+        UserName userName = aMockedUserName();
+        given(user.getUserName()).willReturn(userName);
         given(user.getLogin()).willReturn(LOGIN);
         given(user.getPassword()).willReturn(PASSWORD);
         return user;
+    }
+
+    private static User dummyUser() {
+        UserName userName = mock(UserName.class);
+        User user = mock(User.class);
+        given(user.getUserName()).willReturn(userName);
+        return user;
+    }
+
+    private static UserName aMockedUserName() {
+        UserName userName = mock(UserName.class);
+        given(userName.getFirstName()).willReturn(FIRST_NAME);
+        given(userName.getLastName()).willReturn(LAST_NAME);
+        return userName;
     }
 
     private static UserDto aMockedUserDto() {

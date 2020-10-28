@@ -2,6 +2,7 @@ package com.smalaca.taskamanager.domain;
 
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
+import com.smalaca.taskamanager.model.embedded.UserName;
 import com.smalaca.taskamanager.model.entities.Team;
 import com.smalaca.taskamanager.model.entities.User;
 import com.smalaca.taskamanager.model.enums.TeamRole;
@@ -23,8 +24,10 @@ class UserTest {
         User user = new User();
         user.setLogin("antman");
         user.setPassword("4ntZ__Ru13Z");
-        user.setFirstName("Scott");
-        user.setLastName("Lang");
+        UserName userName = new UserName();
+        userName.setFirstName("Scott");
+        userName.setLastName("Lang");
+        user.setUserName(userName);
         user.setTeamRole(TeamRole.DEVELOPER);
         PhoneNumber phoneNumber = new PhoneNumber();
         phoneNumber.setPrefix("4NT");
@@ -37,8 +40,8 @@ class UserTest {
         assertThat(user.getId()).isNull();
         assertThat(user.getLogin()).isEqualTo("antman");
         assertThat(user.getPassword()).isEqualTo("4ntZ__Ru13Z");
-        assertThat(user.getFirstName()).isEqualTo("Scott");
-        assertThat(user.getLastName()).isEqualTo("Lang");
+        assertThat(user.getUserName().getFirstName()).isEqualTo("Scott");
+        assertThat(user.getUserName().getLastName()).isEqualTo("Lang");
         assertThat(user.getTeamRole()).isEqualTo(TeamRole.DEVELOPER);
         assertThat(user.getPhoneNumber().getPrefix()).isEqualTo("4NT");
         assertThat(user.getPhoneNumber().getNumber()).isEqualTo("421399999");
@@ -139,8 +142,10 @@ class UserTest {
 
     private static User differentUser() {
         User user = new User();
-        user.setFirstName("Peter");
-        user.setLastName("Parker");
+        UserName userName = new UserName();
+        userName.setFirstName("Peter");
+        userName.setLastName("Parker");
+        user.setUserName(userName);
         user.setLogin("spiderman");
         user.setPassword("responsibility");
         EmailAddress emailAddress = new EmailAddress();
@@ -157,8 +162,10 @@ class UserTest {
 
     private User user() {
         User user = new User();
-        user.setFirstName("Wanda");
-        user.setLastName("Maximoff");
+        UserName userName = new UserName();
+        userName.setFirstName("Wanda");
+        userName.setLastName("Maximoff");
+        user.setUserName(userName);
         user.setLogin("Scarlet Witch");
         user.setPassword("qw3rty");
         EmailAddress emailAddress = new EmailAddress();

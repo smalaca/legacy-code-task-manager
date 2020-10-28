@@ -1,6 +1,7 @@
 package com.smalaca.taskamanager.domain;
 
 import com.smalaca.taskamanager.model.embedded.Codename;
+import com.smalaca.taskamanager.model.embedded.UserName;
 import com.smalaca.taskamanager.model.entities.Team;
 import com.smalaca.taskamanager.model.entities.User;
 import org.junit.jupiter.api.Test;
@@ -92,8 +93,10 @@ class TeamTest {
 
     private User user(String firstName, String lastName) {
         User user = new User();
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
+        UserName userName = new UserName();
+        userName.setFirstName(firstName);
+        userName.setLastName(lastName);
+        user.setUserName(userName);
         return user;
     }
 
