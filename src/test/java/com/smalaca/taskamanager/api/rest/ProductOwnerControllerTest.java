@@ -197,7 +197,7 @@ class ProductOwnerControllerTest {
     @Test
     void shouldAssignProjectToProductOwner() {
         given(productOwnerRepository.findById(PRODUCT_OWNER_ID)).willReturn(Optional.of(productOwner()));
-        given(projectRepository.findById(NEW_PROJECT_ID)).willReturn(Optional.of(project(NEW_PROJECT_ID)));
+        given(projectRepository.findById(NEW_PROJECT_ID)).willReturn(Optional.of(notAssignedProject(NEW_PROJECT_ID)));
 
         ResponseEntity<Void> actual = controller.addProject(PRODUCT_OWNER_ID, NEW_PROJECT_ID);
 
@@ -236,8 +236,9 @@ class ProductOwnerControllerTest {
 
     @Test
     void shouldRemoveProjectToProductOwner() {
-        given(productOwnerRepository.findById(PRODUCT_OWNER_ID)).willReturn(Optional.of(productOwner()));
-        given(projectRepository.findById(PROJECT_ID_2)).willReturn(Optional.of(project(PROJECT_ID_2)));
+        ProductOwner productOwner = productOwner();
+        given(productOwnerRepository.findById(PRODUCT_OWNER_ID)).willReturn(Optional.of(productOwner));
+        given(projectRepository.findById(PROJECT_ID_2)).willReturn(Optional.of(project(PROJECT_ID_2, productOwner)));
 
         ResponseEntity<Void> actual = controller.removeProject(PRODUCT_OWNER_ID, PROJECT_ID_2);
 
@@ -259,8 +260,8 @@ class ProductOwnerControllerTest {
         EmailAddress emailAddress = new EmailAddress();
         emailAddress.setEmailAddress(EMAIL_ADDRESS);
         productOwner.setEmailAddress(emailAddress);
-        productOwner.addProject(project(PROJECT_ID_1));
-        productOwner.addProject(project(PROJECT_ID_2));
+        productOwner.addProject(project(PROJECT_ID_1, productOwner));
+        productOwner.addProject(project(PROJECT_ID_2, productOwner));
         return productOwner;
     }
 
@@ -276,7 +277,13 @@ class ProductOwnerControllerTest {
         }
     }
 
-    private Project project(long id) {
+    private Project project(long id, ProductOwner productOwner) {
+        Project project = new Project();
+        project.setProductOwner(productOwner);
+        return setId(id, project);
+    }
+
+    private Project notAssignedProject(long id) {
         return setId(id, new Project());
     }
 
