@@ -1,8 +1,8 @@
 package com.smalaca.taskamanager.repository;
 
-import com.smalaca.taskamanager.domain.EmailAddress;
-import com.smalaca.taskamanager.domain.PhoneNumber;
-import com.smalaca.taskamanager.domain.User;
+import com.smalaca.taskamanager.model.embedded.EmailAddress;
+import com.smalaca.taskamanager.model.embedded.PhoneNumber;
+import com.smalaca.taskamanager.model.entities.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

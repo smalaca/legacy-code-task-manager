@@ -1,7 +1,7 @@
 package com.smalaca.taskamanager.api.rest;
 
-import com.smalaca.taskamanager.domain.Codename;
-import com.smalaca.taskamanager.domain.Team;
+import com.smalaca.taskamanager.model.embedded.Codename;
+import com.smalaca.taskamanager.model.entities.Team;
 import com.smalaca.taskamanager.repository.TeamRepository;
 import org.apache.commons.lang3.RandomUtils;
 

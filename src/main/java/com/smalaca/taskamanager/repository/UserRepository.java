@@ -1,6 +1,6 @@
 package com.smalaca.taskamanager.repository;
 
-import com.smalaca.taskamanager.domain.User;
+import com.smalaca.taskamanager.model.entities.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

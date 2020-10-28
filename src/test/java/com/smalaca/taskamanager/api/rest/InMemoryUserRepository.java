@@ -1,9 +1,9 @@
 package com.smalaca.taskamanager.api.rest;
 
-import com.smalaca.taskamanager.domain.EmailAddress;
-import com.smalaca.taskamanager.domain.PhoneNumber;
-import com.smalaca.taskamanager.domain.TeamRole;
-import com.smalaca.taskamanager.domain.User;
+import com.smalaca.taskamanager.model.embedded.EmailAddress;
+import com.smalaca.taskamanager.model.embedded.PhoneNumber;
+import com.smalaca.taskamanager.model.entities.User;
+import com.smalaca.taskamanager.model.enums.TeamRole;
 import com.smalaca.taskamanager.repository.UserRepository;
 import org.apache.commons.lang3.RandomUtils;
 
@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.smalaca.taskamanager.domain.TeamRole.BUSINESS_ANALYSIS;
-import static com.smalaca.taskamanager.domain.TeamRole.DEVELOPER;
-import static com.smalaca.taskamanager.domain.TeamRole.TESTER;
+import static com.smalaca.taskamanager.model.enums.TeamRole.BUSINESS_ANALYSIS;
+import static com.smalaca.taskamanager.model.enums.TeamRole.DEVELOPER;
+import static com.smalaca.taskamanager.model.enums.TeamRole.TESTER;
 import static java.util.List.copyOf;
 
 class InMemoryUserRepository implements UserRepository {

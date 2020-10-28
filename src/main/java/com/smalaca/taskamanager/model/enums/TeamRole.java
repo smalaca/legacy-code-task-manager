@@ -1,4 +1,4 @@
-package com.smalaca.taskamanager.domain;
+package com.smalaca.taskamanager.model.enums;
 
 public enum TeamRole {
     DEVELOPER,

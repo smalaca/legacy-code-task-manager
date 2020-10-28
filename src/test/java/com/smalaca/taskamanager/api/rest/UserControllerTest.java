@@ -1,7 +1,7 @@
 package com.smalaca.taskamanager.api.rest;
 
-import com.smalaca.taskamanager.domain.TeamRole;
 import com.smalaca.taskamanager.dto.UserDto;
+import com.smalaca.taskamanager.model.enums.TeamRole;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -10,9 +10,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.List;
 import java.util.UUID;
 
-import static com.smalaca.taskamanager.domain.TeamRole.BUSINESS_ANALYSIS;
-import static com.smalaca.taskamanager.domain.TeamRole.DEVELOPER;
-import static com.smalaca.taskamanager.domain.TeamRole.TESTER;
+import static com.smalaca.taskamanager.model.enums.TeamRole.BUSINESS_ANALYSIS;
+import static com.smalaca.taskamanager.model.enums.TeamRole.DEVELOPER;
+import static com.smalaca.taskamanager.model.enums.TeamRole.TESTER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.CREATED;
