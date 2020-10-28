@@ -2,6 +2,7 @@ package com.smalaca.taskamanager.api.rest;
 
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
+import com.smalaca.taskamanager.model.embedded.UserName;
 import com.smalaca.taskamanager.model.entities.User;
 import com.smalaca.taskamanager.model.enums.TeamRole;
 import com.smalaca.taskamanager.repository.UserRepository;
@@ -33,8 +34,10 @@ class InMemoryUserRepository implements UserRepository {
 
     private User aUser(long id, String firstName, String lastName, String login, TeamRole teamRole, String emailAddress, String phoneNumber) {
         User user = new User();
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
+        UserName userName = new UserName();
+        userName.setFirstName(firstName);
+        userName.setLastName(lastName);
+        user.setUserName(userName);
         user.setLogin(login);
         user.setPassword(DUMMY_PASSWORD);
         user.setTeamRole(teamRole);
@@ -79,7 +82,7 @@ class InMemoryUserRepository implements UserRepository {
     @Override
     public Optional<User> findByFirstNameAndLastName(String firstName, String lastName) {
         for (User user : findAll()) {
-            if (user.getFirstName().equals(firstName) && user.getLastName().equals(lastName)) {
+            if (user.getUserName().getFirstName().equals(firstName) && user.getUserName().getLastName().equals(lastName)) {
                 return Optional.of(user);
             }
         }

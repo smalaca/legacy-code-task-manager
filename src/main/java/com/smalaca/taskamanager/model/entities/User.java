@@ -2,6 +2,7 @@ package com.smalaca.taskamanager.model.entities;
 
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
+import com.smalaca.taskamanager.model.embedded.UserName;
 import com.smalaca.taskamanager.model.enums.TeamRole;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -22,10 +23,11 @@ public class User {
     @Id
     @GeneratedValue
     private Long id;
-    private String firstName;
-    private String lastName;
     private String login;
     private String password;
+
+    @Embedded
+    private UserName userName;
 
     @Embedded
     private PhoneNumber phoneNumber;
@@ -39,20 +41,12 @@ public class User {
     @OneToMany
     private List<Team> teams = new ArrayList<>();
 
-    public String getFirstName() {
-        return firstName;
+    public UserName getUserName() {
+        return userName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setUserName(UserName userName) {
+        this.userName = userName;
     }
 
     public String getLogin() {
@@ -132,8 +126,7 @@ public class User {
 
         return new EqualsBuilder()
                 .append(id, user.id)
-                .append(firstName, user.firstName)
-                .append(lastName, user.lastName)
+                .append(userName, user.userName)
                 .append(login, user.login)
                 .append(password, user.password)
                 .append(phoneNumber, user.phoneNumber)
@@ -147,8 +140,7 @@ public class User {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(id)
-                .append(firstName)
-                .append(lastName)
+                .append(userName)
                 .append(login)
                 .append(password)
                 .append(phoneNumber)

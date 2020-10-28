@@ -129,9 +129,9 @@ class UserControllerMockTest {
         assertThat(response.getHeaders().getLocation().normalize()).isEqualTo(DUMMY_URI);
         then(repository).should().save(argumentCaptor.capture());
         User user = argumentCaptor.getValue();
-        assertThat(user.getFirstName()).isEqualTo(FIRST_NAME);
+        assertThat(user.getUserName().getFirstName()).isEqualTo(FIRST_NAME);
         assertThat(user.getTeamRole()).isEqualTo(TEAM_ROLE);
-        assertThat(user.getLastName()).isEqualTo(LAST_NAME);
+        assertThat(user.getUserName().getLastName()).isEqualTo(LAST_NAME);
         assertThat(user.getLogin()).isEqualTo(LOGIN);
         assertThat(user.getPassword()).isEqualTo(PASSWORD);
     }
@@ -205,8 +205,8 @@ class UserControllerMockTest {
     private static User aMockedUser() {
         User user = mock(User.class);
         given(user.getId()).willReturn(EXISTING_USER_ID);
-        given(user.getFirstName()).willReturn(FIRST_NAME);
-        given(user.getLastName()).willReturn(LAST_NAME);
+        given(user.getUserName().getFirstName()).willReturn(FIRST_NAME);
+        given(user.getUserName().getLastName()).willReturn(LAST_NAME);
         given(user.getLogin()).willReturn(LOGIN);
         given(user.getPassword()).willReturn(PASSWORD);
         return user;
