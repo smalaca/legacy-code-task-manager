@@ -1,4 +1,7 @@
-package com.smalaca.taskamanager.domain;
+package com.smalaca.taskamanager.model.entities;
+
+import com.smalaca.taskamanager.model.embedded.EmailAddress;
+import com.smalaca.taskamanager.model.embedded.PhoneNumber;
 
 import javax.persistence.Embedded;
 import javax.persistence.Entity;

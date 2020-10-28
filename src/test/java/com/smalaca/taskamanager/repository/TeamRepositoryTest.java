@@ -1,7 +1,7 @@
 package com.smalaca.taskamanager.repository;
 
-import com.smalaca.taskamanager.domain.Codename;
-import com.smalaca.taskamanager.domain.Team;
+import com.smalaca.taskamanager.model.embedded.Codename;
+import com.smalaca.taskamanager.model.entities.Team;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,5 +1,6 @@
-package com.smalaca.taskamanager.domain;
+package com.smalaca.taskamanager.model.entities;
 
+import com.smalaca.taskamanager.model.enums.ProjectStatus;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -11,7 +12,7 @@ import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.smalaca.taskamanager.domain.ProjectStatus.IDEA;
+import static com.smalaca.taskamanager.model.enums.ProjectStatus.IDEA;
 
 @Entity
 public class Project {

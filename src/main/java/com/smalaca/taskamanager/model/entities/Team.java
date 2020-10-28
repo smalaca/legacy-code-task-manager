@@ -1,5 +1,6 @@
-package com.smalaca.taskamanager.domain;
+package com.smalaca.taskamanager.model.entities;
 
+import com.smalaca.taskamanager.model.embedded.Codename;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 

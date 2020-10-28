@@ -1,11 +1,11 @@
 package com.smalaca.taskamanager.api.rest;
 
-import com.smalaca.taskamanager.domain.EmailAddress;
-import com.smalaca.taskamanager.domain.PhoneNumber;
-import com.smalaca.taskamanager.domain.ProductOwner;
-import com.smalaca.taskamanager.domain.Project;
 import com.smalaca.taskamanager.dto.ProductOwnerDto;
 import com.smalaca.taskamanager.exception.ProductOwnerNotFoundException;
+import com.smalaca.taskamanager.model.embedded.EmailAddress;
+import com.smalaca.taskamanager.model.embedded.PhoneNumber;
+import com.smalaca.taskamanager.model.entities.ProductOwner;
+import com.smalaca.taskamanager.model.entities.Project;
 import com.smalaca.taskamanager.repository.ProductOwnerRepository;
 import com.smalaca.taskamanager.repository.ProjectRepository;
 import org.springframework.http.HttpHeaders;

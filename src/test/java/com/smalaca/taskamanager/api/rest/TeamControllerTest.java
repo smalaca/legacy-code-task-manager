@@ -1,8 +1,8 @@
 package com.smalaca.taskamanager.api.rest;
 
-import com.smalaca.taskamanager.domain.User;
 import com.smalaca.taskamanager.dto.TeamDto;
 import com.smalaca.taskamanager.dto.TeamMembersDto;
+import com.smalaca.taskamanager.model.entities.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;

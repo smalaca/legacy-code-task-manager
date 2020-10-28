@@ -1,5 +1,8 @@
 package com.smalaca.taskamanager.domain;
 
+import com.smalaca.taskamanager.model.embedded.Codename;
+import com.smalaca.taskamanager.model.entities.Team;
+import com.smalaca.taskamanager.model.entities.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;

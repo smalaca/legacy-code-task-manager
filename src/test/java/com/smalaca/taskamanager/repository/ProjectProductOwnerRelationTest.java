@@ -1,7 +1,7 @@
 package com.smalaca.taskamanager.repository;
 
-import com.smalaca.taskamanager.domain.ProductOwner;
-import com.smalaca.taskamanager.domain.Project;
+import com.smalaca.taskamanager.model.entities.ProductOwner;
+import com.smalaca.taskamanager.model.entities.Project;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

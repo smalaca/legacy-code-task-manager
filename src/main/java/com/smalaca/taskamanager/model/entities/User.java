@@ -1,5 +1,8 @@
-package com.smalaca.taskamanager.domain;
+package com.smalaca.taskamanager.model.entities;
 
+import com.smalaca.taskamanager.model.embedded.EmailAddress;
+import com.smalaca.taskamanager.model.embedded.PhoneNumber;
+import com.smalaca.taskamanager.model.enums.TeamRole;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 

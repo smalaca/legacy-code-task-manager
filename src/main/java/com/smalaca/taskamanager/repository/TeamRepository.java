@@ -1,6 +1,6 @@
 package com.smalaca.taskamanager.repository;
 
-import com.smalaca.taskamanager.domain.Team;
+import com.smalaca.taskamanager.model.entities.Team;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

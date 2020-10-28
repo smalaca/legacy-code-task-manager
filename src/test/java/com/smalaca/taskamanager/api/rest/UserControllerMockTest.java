@@ -1,11 +1,11 @@
 package com.smalaca.taskamanager.api.rest;
 
 import com.google.common.collect.ImmutableList;
-import com.smalaca.taskamanager.domain.EmailAddress;
-import com.smalaca.taskamanager.domain.PhoneNumber;
-import com.smalaca.taskamanager.domain.TeamRole;
-import com.smalaca.taskamanager.domain.User;
 import com.smalaca.taskamanager.dto.UserDto;
+import com.smalaca.taskamanager.model.embedded.EmailAddress;
+import com.smalaca.taskamanager.model.embedded.PhoneNumber;
+import com.smalaca.taskamanager.model.entities.User;
+import com.smalaca.taskamanager.model.enums.TeamRole;
 import com.smalaca.taskamanager.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +22,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
-import static com.smalaca.taskamanager.domain.TeamRole.BUSINESS_ANALYSIS;
+import static com.smalaca.taskamanager.model.enums.TeamRole.BUSINESS_ANALYSIS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;

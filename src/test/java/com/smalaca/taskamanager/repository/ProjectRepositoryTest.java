@@ -1,7 +1,7 @@
 package com.smalaca.taskamanager.repository;
 
-import com.smalaca.taskamanager.domain.Project;
-import com.smalaca.taskamanager.domain.ProjectStatus;
+import com.smalaca.taskamanager.model.entities.Project;
+import com.smalaca.taskamanager.model.enums.ProjectStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

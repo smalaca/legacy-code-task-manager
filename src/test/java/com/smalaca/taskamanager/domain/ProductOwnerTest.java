@@ -1,5 +1,7 @@
 package com.smalaca.taskamanager.domain;
 
+import com.smalaca.taskamanager.model.entities.ProductOwner;
+import com.smalaca.taskamanager.model.entities.Project;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;

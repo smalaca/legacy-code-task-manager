@@ -2,12 +2,12 @@ package com.smalaca.taskamanager.api.rest;
 
 
 import com.google.common.collect.Iterables;
-import com.smalaca.taskamanager.domain.Codename;
-import com.smalaca.taskamanager.domain.Team;
-import com.smalaca.taskamanager.domain.User;
 import com.smalaca.taskamanager.dto.TeamDto;
 import com.smalaca.taskamanager.dto.TeamMembersDto;
 import com.smalaca.taskamanager.exception.TeamNotFoundException;
+import com.smalaca.taskamanager.model.embedded.Codename;
+import com.smalaca.taskamanager.model.entities.Team;
+import com.smalaca.taskamanager.model.entities.User;
 import com.smalaca.taskamanager.repository.TeamRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
 import org.springframework.http.HttpHeaders;
