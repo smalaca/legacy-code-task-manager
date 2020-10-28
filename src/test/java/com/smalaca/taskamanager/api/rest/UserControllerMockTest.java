@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.smalaca.taskamanager.dto.UserDto;
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
+import com.smalaca.taskamanager.model.embedded.UserName;
 import com.smalaca.taskamanager.model.entities.User;
 import com.smalaca.taskamanager.model.enums.TeamRole;
 import com.smalaca.taskamanager.repository.UserRepository;
@@ -37,8 +38,8 @@ import static org.springframework.http.HttpStatus.OK;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerMockTest {
-    private static final User DUMMY_USER_1 = mock(User.class);
-    private static final User DUMMY_USER_2 = mock(User.class);
+    private static final User DUMMY_USER_1 = dummyUser();
+    private static final User DUMMY_USER_2 = dummyUser();
     private static final List<User> DUMMY_USERS = ImmutableList.of(DUMMY_USER_1, DUMMY_USER_2);
     private static final Long EXISTING_USER_ID = 13L;
     private static final Long NOT_EXISTING_USER_ID = 69L;
@@ -205,11 +206,25 @@ class UserControllerMockTest {
     private static User aMockedUser() {
         User user = mock(User.class);
         given(user.getId()).willReturn(EXISTING_USER_ID);
-        given(user.getUserName().getFirstName()).willReturn(FIRST_NAME);
-        given(user.getUserName().getLastName()).willReturn(LAST_NAME);
+        UserName userName = aMockedUserName();
+        given(user.getUserName()).willReturn(userName);
         given(user.getLogin()).willReturn(LOGIN);
         given(user.getPassword()).willReturn(PASSWORD);
         return user;
+    }
+
+    private static User dummyUser() {
+        UserName userName = mock(UserName.class);
+        User user = mock(User.class);
+        given(user.getUserName()).willReturn(userName);
+        return user;
+    }
+
+    private static UserName aMockedUserName() {
+        UserName userName = mock(UserName.class);
+        given(userName.getFirstName()).willReturn(FIRST_NAME);
+        given(userName.getLastName()).willReturn(LAST_NAME);
+        return userName;
     }
 
     private static UserDto aMockedUserDto() {
