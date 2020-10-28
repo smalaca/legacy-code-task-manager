@@ -55,7 +55,7 @@ class ProductOwnerControllerTest {
 
     @Test
     void shouldFindProductOwner() {
-        ProductOwner productOwner = new ProductOwner();
+        ProductOwner productOwner = productOwnerWithId();
         productOwner.setFirstName(FIRST_NAME);
         productOwner.setLastName(LAST_NAME);
         given(productOwnerRepository.findById(PRODUCT_OWNER_ID)).willReturn(Optional.of(productOwner));
@@ -64,6 +64,7 @@ class ProductOwnerControllerTest {
 
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
         ProductOwnerDto dto = actual.getBody();
+        assertThat(dto.getId()).isEqualTo(PRODUCT_OWNER_ID);
         assertThat(dto.getFirstName()).isEqualTo(FIRST_NAME);
         assertThat(dto.getLastName()).isEqualTo(LAST_NAME);
         assertThat(dto.getPhonePrefix()).isNull();
@@ -81,6 +82,7 @@ class ProductOwnerControllerTest {
 
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
         ProductOwnerDto dto = actual.getBody();
+        assertThat(dto.getId()).isEqualTo(PRODUCT_OWNER_ID);
         assertThat(dto.getFirstName()).isEqualTo(FIRST_NAME);
         assertThat(dto.getLastName()).isEqualTo(LAST_NAME);
         assertThat(dto.getPhonePrefix()).isEqualTo(PHONE_PREFIX);
@@ -105,7 +107,7 @@ class ProductOwnerControllerTest {
     void shouldCreateProductOwner() {
         UriComponentsBuilder uriComponentsBuilder = fromUriString("/");
         given(productOwnerRepository.findByFirstNameAndLastName(FIRST_NAME, LAST_NAME)).willReturn(Optional.empty());
-        given(productOwnerRepository.save(any())).willReturn(new ProductOwner());
+        given(productOwnerRepository.save(any())).willReturn(productOwnerWithId());
         ProductOwnerDto dto = new ProductOwnerDto();
         dto.setFirstName(FIRST_NAME);
         dto.setLastName(LAST_NAME);
@@ -113,7 +115,7 @@ class ProductOwnerControllerTest {
         ResponseEntity<Void> actual = controller.create(dto, uriComponentsBuilder);
 
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(actual.getHeaders().getLocation().getPath()).isEqualTo("/product-owner/");
+        assertThat(actual.getHeaders().getLocation().getPath()).isEqualTo("/product-owner/13");
         then(productOwnerRepository).should().save(productOwnerCaptor.capture());
         ProductOwner productOwner = productOwnerCaptor.getValue();
         assertThat(productOwner.getFirstName()).isEqualTo(FIRST_NAME);
@@ -145,6 +147,7 @@ class ProductOwnerControllerTest {
 
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
         ProductOwnerDto productOwnerDto = actual.getBody();
+        assertThat(productOwnerDto.getId()).isEqualTo(PRODUCT_OWNER_ID);
         assertThat(productOwnerDto.getFirstName()).isEqualTo(FIRST_NAME);
         assertThat(productOwnerDto.getLastName()).isEqualTo(LAST_NAME);
         assertThat(productOwnerDto.getPhonePrefix()).isEqualTo("9876");
@@ -246,7 +249,7 @@ class ProductOwnerControllerTest {
     }
 
     private ProductOwner productOwner() {
-        ProductOwner productOwner = new ProductOwner();
+        ProductOwner productOwner = productOwnerWithId();
         productOwner.setFirstName(FIRST_NAME);
         productOwner.setLastName(LAST_NAME);
         PhoneNumber phoneNumber = new PhoneNumber();
@@ -259,6 +262,18 @@ class ProductOwnerControllerTest {
         productOwner.addProject(project(PROJECT_ID_1));
         productOwner.addProject(project(PROJECT_ID_2));
         return productOwner;
+    }
+
+    private ProductOwner productOwnerWithId() {
+        try {
+            ProductOwner productOwner = new ProductOwner();
+            Field fieldId = ProductOwner.class.getDeclaredField("id");
+            fieldId.setAccessible(true);
+            fieldId.set(productOwner, PRODUCT_OWNER_ID);
+            return productOwner;
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Project project(long id) {
