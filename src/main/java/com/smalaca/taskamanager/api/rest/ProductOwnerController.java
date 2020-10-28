@@ -28,6 +28,7 @@ import static java.util.stream.Collectors.toList;
 
 @RestController
 @RequestMapping("/product-owner")
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class ProductOwnerController {
     private final ProductOwnerRepository productOwnerRepository;
     private final ProjectRepository projectRepository;
