@@ -6,7 +6,6 @@ import com.smalaca.taskamanager.model.entities.Project;
 import com.smalaca.taskamanager.model.entities.Team;
 import com.smalaca.taskamanager.model.enums.ProjectStatus;
 import com.smalaca.taskamanager.repository.ProjectRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,10 +26,9 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/project")
-class ProjectController {
+public class ProjectController {
     private final ProjectRepository projectRepository;
 
-    @Autowired
     public ProjectController(ProjectRepository projectRepository) {
         this.projectRepository = projectRepository;
     }
