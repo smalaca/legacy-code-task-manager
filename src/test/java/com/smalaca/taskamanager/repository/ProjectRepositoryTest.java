@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -41,6 +42,20 @@ class ProjectRepositoryTest {
 
         assertThat(actual.getName()).isEqualTo("Avengers");
         assertThat(actual.getProjectStatus()).isEqualTo(ProjectStatus.STARTED);
+    }
+
+    @Test
+    void shouldFindProjectByName() {
+        repository.saveAll(asList(
+                project("X-Men", ProjectStatus.IDEA),
+                project("Avengers", ProjectStatus.STARTED),
+                project("Shi-ar", ProjectStatus.UNDER_MAINTENANCE)
+        ));
+
+        Project actual = repository.findByName("Shi-ar").get();
+
+        assertThat(actual.getName()).isEqualTo("Shi-ar");
+        assertThat(actual.getProjectStatus()).isEqualTo(ProjectStatus.UNDER_MAINTENANCE);
     }
 
     private Project project(String name, ProjectStatus status) {
