@@ -28,6 +28,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/epic")
+@SuppressWarnings({"checkstyle:ClassFanOutComplexity", "checkstyle:NestedIfDepth"})
 public class EpicController {
     private final EpicRepository epicRepository;
     private final ProjectRepository projectRepository;
