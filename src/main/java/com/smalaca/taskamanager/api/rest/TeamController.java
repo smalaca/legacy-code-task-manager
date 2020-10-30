@@ -43,7 +43,6 @@ public class TeamController {
     }
 
     @GetMapping
-    @Transactional
     public ResponseEntity<List<TeamDto>> findAll() {
         List<TeamDto> teams = StreamSupport.stream(teamRepository.findAll().spliterator(), false)
                 .map(team -> {

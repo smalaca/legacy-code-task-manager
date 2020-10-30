@@ -80,7 +80,6 @@
         <module name="OneTopLevelClass"/>
         <module name="OperatorWrap"/>
         <module name="OuterTypeFilename"/>
-        <module name="OverloadMethodsDeclarationOrder"/>
         <module name="PackageDeclaration"/>
         <module name="ParameterAssignment"/>
         <module name="ParameterNumber">
