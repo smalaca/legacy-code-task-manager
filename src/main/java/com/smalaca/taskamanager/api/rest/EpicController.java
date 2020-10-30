@@ -28,7 +28,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/epic")
-@SuppressWarnings({"checkstyle:ClassFanOutComplexity", "checkstyle:NestedIfDepth"})
+@SuppressWarnings({"checkstyle:ClassFanOutComplexity", "checkstyle:NestedIfDepth", "PMD.CollapsibleIfStatements"})
 public class EpicController {
     private final EpicRepository epicRepository;
     private final ProjectRepository projectRepository;
