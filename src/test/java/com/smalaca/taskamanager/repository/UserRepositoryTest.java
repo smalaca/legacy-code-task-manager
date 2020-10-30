@@ -7,7 +7,7 @@ import com.smalaca.taskamanager.model.entities.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+@DataJpaTest
 class UserRepositoryTest {
     @Autowired private UserRepository repository;
 
