@@ -29,6 +29,9 @@ public class Project {
 
     @OneToMany
     private List<Team> teams = new ArrayList<>();
+    
+    @OneToMany
+    private List<Epic> epics = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -64,6 +67,14 @@ public class Project {
 
     public void addTeam(Team team) {
         teams.add(team);
+    }
+
+    public List<Epic> getEpics() {
+        return epics;
+    }
+
+    public void addEpic(Epic epic) {
+        epics.add(epic);
     }
 
     @Override
