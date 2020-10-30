@@ -211,6 +211,27 @@ class EpicControllerTest {
         return epic;
     }
 
+    @Test
+    void shouldNotDeleteNotExistingEpic() {
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.empty());
+
+        ResponseEntity<Void> actual = controller.delete(EPIC_ID);
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void shouldDeleteEpic() {
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.of(epicWithId()));
+
+        ResponseEntity<Void> actual = controller.delete(EPIC_ID);
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        ArgumentCaptor<Epic> captor = ArgumentCaptor.forClass(Epic.class);
+        then(epicRepository).should().delete(captor.capture());
+        assertThat(captor.getValue().getId()).isEqualTo(EPIC_ID);
+    }
+
     private Epic epicWithId() {
         Epic epic = withId(new Epic(), EPIC_ID);
         return epic;
