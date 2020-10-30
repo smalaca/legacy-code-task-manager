@@ -158,17 +158,17 @@ public class EpicController {
             owner.setFirstName(epic.getOwner().getFirstName());
             owner.setLastName(epic.getOwner().getLastName());
 
-            if (dto.getOwnerEmailAddress() != null) {
-                EmailAddress emailAddress = new EmailAddress();
-                emailAddress.setEmailAddress(dto.getOwnerEmailAddress());
-                owner.setEmailAddress(emailAddress);
-            }
-
             if (dto.getOwnerPhoneNumberPrefix() != null && dto.getOwnerPhoneNumberNumber() != null) {
                 PhoneNumber phoneNumber = new PhoneNumber();
                 phoneNumber.setPrefix(dto.getOwnerPhoneNumberPrefix());
                 phoneNumber.setNumber(dto.getOwnerPhoneNumberNumber());
                 owner.setPhoneNumber(phoneNumber);
+            }
+
+            if (dto.getOwnerEmailAddress() != null) {
+                EmailAddress emailAddress = new EmailAddress();
+                emailAddress.setEmailAddress(dto.getOwnerEmailAddress());
+                owner.setEmailAddress(emailAddress);
             }
 
             epic.setOwner(owner);
@@ -177,14 +177,6 @@ public class EpicController {
             if (dto.getOwnerFirstName() != null) {
                 if (dto.getOwnerLastName() != null) {
                     Owner owner = new Owner();
-                    owner.setFirstName(dto.getOwnerFirstName());
-                    owner.setLastName(dto.getOwnerLastName());
-
-                    if (dto.getOwnerEmailAddress() != null) {
-                        EmailAddress emailAddress = new EmailAddress();
-                        emailAddress.setEmailAddress(dto.getOwnerEmailAddress());
-                        owner.setEmailAddress(emailAddress);
-                    }
 
                     if (dto.getOwnerPhoneNumberPrefix() != null) {
                         if (dto.getOwnerPhoneNumberNumber() != null) {
@@ -193,6 +185,15 @@ public class EpicController {
                             phoneNumber.setNumber(dto.getOwnerPhoneNumberNumber());
                             owner.setPhoneNumber(phoneNumber);
                         }
+                    }
+
+                    owner.setFirstName(dto.getOwnerFirstName());
+                    owner.setLastName(dto.getOwnerLastName());
+
+                    if (dto.getOwnerEmailAddress() != null) {
+                        EmailAddress emailAddress = new EmailAddress();
+                        emailAddress.setEmailAddress(dto.getOwnerEmailAddress());
+                        owner.setEmailAddress(emailAddress);
                     }
 
                     epic.setOwner(owner);
