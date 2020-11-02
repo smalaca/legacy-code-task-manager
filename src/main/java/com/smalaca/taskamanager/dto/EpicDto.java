@@ -1,5 +1,7 @@
 package com.smalaca.taskamanager.dto;
 
+import java.util.List;
+
 @SuppressWarnings("MethodCount")
 public class EpicDto {
     private Long id;
@@ -13,6 +15,7 @@ public class EpicDto {
     private String ownerPhoneNumberNumber;
     private String ownerEmailAddress;
     private Long projectId;
+    private List<WatcherDto> watchers;
 
     public Long getId() {
         return id;
@@ -100,5 +103,13 @@ public class EpicDto {
 
     public void setProjectId(Long projectId) {
         this.projectId = projectId;
+    }
+
+    public List<WatcherDto> getWatchers() {
+        return watchers;
+    }
+
+    public void setWatchers(List<WatcherDto> watchers) {
+        this.watchers = watchers;
     }
 }

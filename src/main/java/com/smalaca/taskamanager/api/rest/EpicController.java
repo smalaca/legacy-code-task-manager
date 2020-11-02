@@ -29,7 +29,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/epic")
@@ -83,6 +85,21 @@ public class EpicController {
                     epicDto.setOwnerEmailAddress(emailAddress.getEmailAddress());
                 }
             }
+
+            List<WatcherDto> watchers = epic.getWatchers().stream().map(watcher -> {
+                WatcherDto watcherDto = new WatcherDto();
+                watcherDto.setFirstName(watcher.getFirstName());
+                watcherDto.setLastName(watcher.getLastName());
+                if (watcher.getEmailAddress() != null) {
+                    watcherDto.setEmailAddress(watcher.getEmailAddress().getEmailAddress());
+                }
+                if (watcher.getPhoneNumber() != null) {
+                    watcherDto.setPhonePrefix(watcher.getPhoneNumber().getPrefix());
+                    watcherDto.setPhoneNumber(watcher.getPhoneNumber().getNumber());
+                }
+                return watcherDto;
+            }).collect(Collectors.toList());
+            epicDto.setWatchers(watchers);
 
             return ResponseEntity.ok(epicDto);
         }

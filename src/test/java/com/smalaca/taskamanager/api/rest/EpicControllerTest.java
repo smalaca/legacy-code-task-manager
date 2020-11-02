@@ -82,6 +82,15 @@ class EpicControllerTest {
         assertThat(dto.getOwnerPhoneNumberPrefix()).isEqualTo(PHONE_PREFIX);
         assertThat(dto.getOwnerPhoneNumberNumber()).isEqualTo(PHONE_NUMBER);
         assertThat(dto.getProjectId()).isEqualTo(PROJECT_ID);
+        assertThat(dto.getWatchers())
+                .hasSize(1)
+                .anySatisfy(watcherDto -> {
+                    assertThat(watcherDto.getFirstName()).isEqualTo(ANOTHER_FIRST_NAME);
+                    assertThat(watcherDto.getLastName()).isEqualTo(ANOTHER_LAST_NAME);
+                    assertThat(watcherDto.getEmailAddress()).isEqualTo(ANOTHER_EMAIL_ADDRESS);
+                    assertThat(watcherDto.getPhonePrefix()).isEqualTo(ANOTHER_PHONE_PREFIX);
+                    assertThat(watcherDto.getPhoneNumber()).isEqualTo(ANOTHER_PHONE_NUMBER);
+                });
     }
 
     private Epic existingEpic() {
@@ -97,6 +106,7 @@ class EpicControllerTest {
         phoneNumber.setNumber(PHONE_NUMBER);
         owner.setPhoneNumber(phoneNumber);
         epic.setOwner(owner);
+        epic.addWatcher(watcher());
 
         return epic;
     }
@@ -352,6 +362,12 @@ class EpicControllerTest {
 
     private Epic epicWithWatcher() {
         Epic epic = epicWithId();
+        epic.addWatcher(watcher());
+
+        return epic;
+    }
+
+    private Watcher watcher() {
         Watcher watcher = new Watcher();
         watcher.setFirstName(ANOTHER_FIRST_NAME);
         watcher.setLastName(ANOTHER_LAST_NAME);
@@ -362,9 +378,7 @@ class EpicControllerTest {
         phoneNumber.setPrefix(ANOTHER_PHONE_PREFIX);
         phoneNumber.setNumber(ANOTHER_PHONE_NUMBER);
         watcher.setPhoneNumber(phoneNumber);
-        epic.addWatcher(watcher);
-
-        return epic;
+        return watcher;
     }
 
     private WatcherDto watcherDto() {
