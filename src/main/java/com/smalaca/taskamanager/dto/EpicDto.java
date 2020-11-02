@@ -1,5 +1,6 @@
 package com.smalaca.taskamanager.dto;
 
+@SuppressWarnings("MethodCount")
 public class EpicDto {
     private Long id;
     private String title;
