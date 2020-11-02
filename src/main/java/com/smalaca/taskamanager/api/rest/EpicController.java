@@ -9,9 +9,11 @@ import com.smalaca.taskamanager.model.embedded.Owner;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
 import com.smalaca.taskamanager.model.entities.Epic;
 import com.smalaca.taskamanager.model.entities.Project;
+import com.smalaca.taskamanager.model.entities.User;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 import com.smalaca.taskamanager.repository.EpicRepository;
 import com.smalaca.taskamanager.repository.ProjectRepository;
+import com.smalaca.taskamanager.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,10 +33,12 @@ import java.util.Optional;
 @SuppressWarnings({"checkstyle:ClassFanOutComplexity", "checkstyle:NestedIfDepth", "PMD.CollapsibleIfStatements"})
 public class EpicController {
     private final EpicRepository epicRepository;
+    private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
 
-    public EpicController(EpicRepository epicRepository, ProjectRepository projectRepository) {
+    public EpicController(EpicRepository epicRepository, UserRepository userRepository, ProjectRepository projectRepository) {
         this.epicRepository = epicRepository;
+        this.userRepository = userRepository;
         this.projectRepository = projectRepository;
     }
 
@@ -90,25 +94,28 @@ public class EpicController {
         epic.setDescription(dto.getDescription());
         epic.setStatus(ToDoItemStatus.valueOf(dto.getStatus()));
 
-        if (dto.getOwnerFirstName() != null) {
-            if (dto.getOwnerLastName() != null) {
-                Owner owner = new Owner();
-                owner.setFirstName(dto.getOwnerFirstName());
-                owner.setLastName(dto.getOwnerLastName());
+        if (dto.getOwnerId() != null) {
+            Optional<User> found = userRepository.findById(dto.getOwnerId());
 
-                if (dto.getOwnerEmailAddress() != null) {
+            if (found.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+            } else {
+                User user = found.get();
+                Owner owner = new Owner();
+                owner.setFirstName(user.getUserName().getFirstName());
+                owner.setLastName(user.getUserName().getLastName());
+
+                if (user.getEmailAddress() != null) {
                     EmailAddress emailAddress = new EmailAddress();
-                    emailAddress.setEmailAddress(dto.getOwnerEmailAddress());
+                    emailAddress.setEmailAddress(user.getEmailAddress().getEmailAddress());
                     owner.setEmailAddress(emailAddress);
                 }
 
-                if (dto.getOwnerPhoneNumberPrefix() != null) {
-                    if (dto.getOwnerPhoneNumberNumber() != null) {
-                        PhoneNumber phoneNumber = new PhoneNumber();
-                        phoneNumber.setPrefix(dto.getOwnerPhoneNumberPrefix());
-                        phoneNumber.setNumber(dto.getOwnerPhoneNumberNumber());
-                        owner.setPhoneNumber(phoneNumber);
-                    }
+                if (user.getPhoneNumber() != null) {
+                    PhoneNumber phoneNumber = new PhoneNumber();
+                    phoneNumber.setPrefix(user.getPhoneNumber().getPrefix());
+                    phoneNumber.setNumber(user.getPhoneNumber().getNumber());
+                    owner.setPhoneNumber(phoneNumber);
                 }
 
                 epic.setOwner(owner);
@@ -174,29 +181,32 @@ public class EpicController {
             epic.setOwner(owner);
 
         } else {
-            if (dto.getOwnerFirstName() != null) {
-                if (dto.getOwnerLastName() != null) {
+            if (dto.getOwnerId() != null) {
+                boolean userExists = userRepository.existsById(dto.getOwnerId());
+
+                if (userExists) {
+                    User user = userRepository.findById(dto.getOwnerId()).get();
                     Owner owner = new Owner();
 
-                    if (dto.getOwnerPhoneNumberPrefix() != null) {
-                        if (dto.getOwnerPhoneNumberNumber() != null) {
-                            PhoneNumber phoneNumber = new PhoneNumber();
-                            phoneNumber.setPrefix(dto.getOwnerPhoneNumberPrefix());
-                            phoneNumber.setNumber(dto.getOwnerPhoneNumberNumber());
-                            owner.setPhoneNumber(phoneNumber);
-                        }
+                    if (user.getPhoneNumber() != null) {
+                        PhoneNumber phoneNumber = new PhoneNumber();
+                        phoneNumber.setPrefix(user.getPhoneNumber().getPrefix());
+                        phoneNumber.setNumber(user.getPhoneNumber().getNumber());
+                        owner.setPhoneNumber(phoneNumber);
                     }
 
-                    owner.setFirstName(dto.getOwnerFirstName());
-                    owner.setLastName(dto.getOwnerLastName());
+                    owner.setFirstName(user.getUserName().getFirstName());
+                    owner.setLastName(user.getUserName().getLastName());
 
-                    if (dto.getOwnerEmailAddress() != null) {
+                    if (user.getEmailAddress() != null) {
                         EmailAddress emailAddress = new EmailAddress();
-                        emailAddress.setEmailAddress(dto.getOwnerEmailAddress());
+                        emailAddress.setEmailAddress(user.getEmailAddress().getEmailAddress());
                         owner.setEmailAddress(emailAddress);
                     }
 
                     epic.setOwner(owner);
+                } else {
+                    return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
                 }
             }
         }

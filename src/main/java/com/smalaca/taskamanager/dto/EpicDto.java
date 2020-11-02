@@ -5,6 +5,7 @@ public class EpicDto {
     private String title;
     private String description;
     private String status;
+    private Long ownerId;
     private String ownerFirstName;
     private String ownerLastName;
     private String ownerPhoneNumberPrefix;
@@ -42,6 +43,14 @@ public class EpicDto {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Long getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
     }
 
     public String getOwnerFirstName() {
