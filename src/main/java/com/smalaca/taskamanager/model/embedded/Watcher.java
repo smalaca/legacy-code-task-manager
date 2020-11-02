@@ -11,40 +11,40 @@ public class Watcher {
     private String firstName;
     private String lastName;
     @Embedded
-    private PhoneNumber phoneNumber;
-    @Embedded
     private EmailAddress emailAddress;
-
-    public String getFirstName() {
-        return firstName;
-    }
+    @Embedded
+    private PhoneNumber phoneNumber;
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getFirstName() {
+        return firstName;
     }
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
-    public PhoneNumber getPhoneNumber() {
-        return phoneNumber;
+    public String getLastName() {
+        return lastName;
     }
 
     public void setPhoneNumber(PhoneNumber phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
-    public EmailAddress getEmailAddress() {
-        return emailAddress;
+    public PhoneNumber getPhoneNumber() {
+        return phoneNumber;
     }
 
     public void setEmailAddress(EmailAddress emailAddress) {
         this.emailAddress = emailAddress;
+    }
+
+    public EmailAddress getEmailAddress() {
+        return emailAddress;
     }
 
     @Override
