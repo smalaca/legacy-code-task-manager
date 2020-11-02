@@ -95,6 +95,8 @@ class EpicControllerTest {
     @Test
     void shouldNotCreateInCaseOfNotExistingProject() {
         given(projectRepository.existsById(PROJECT_ID)).willReturn(false);
+        given(projectRepository.findById(PROJECT_ID)).willReturn(Optional.of(project()));
+        given(userRepository.findById(OWNER_ID)).willReturn(Optional.of(owner()));
 
         ResponseEntity<Long> actual = controller.create(newEpicDto());
 
