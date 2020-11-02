@@ -2,11 +2,14 @@ package com.smalaca.taskamanager.api.rest;
 
 
 import com.smalaca.taskamanager.dto.EpicDto;
+import com.smalaca.taskamanager.dto.WatcherDto;
 import com.smalaca.taskamanager.exception.EpicDoesNotExistException;
 import com.smalaca.taskamanager.exception.ProjectNotFoundException;
+import com.smalaca.taskamanager.exception.UserNotFoundException;
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.Owner;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
+import com.smalaca.taskamanager.model.embedded.Watcher;
 import com.smalaca.taskamanager.model.entities.Epic;
 import com.smalaca.taskamanager.model.entities.Project;
 import com.smalaca.taskamanager.model.entities.User;
@@ -26,7 +29,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/epic")
@@ -80,6 +85,21 @@ public class EpicController {
                     epicDto.setOwnerEmailAddress(emailAddress.getEmailAddress());
                 }
             }
+
+            List<WatcherDto> watchers = epic.getWatchers().stream().map(watcher -> {
+                WatcherDto watcherDto = new WatcherDto();
+                watcherDto.setFirstName(watcher.getFirstName());
+                watcherDto.setLastName(watcher.getLastName());
+                if (watcher.getEmailAddress() != null) {
+                    watcherDto.setEmailAddress(watcher.getEmailAddress().getEmailAddress());
+                }
+                if (watcher.getPhoneNumber() != null) {
+                    watcherDto.setPhonePrefix(watcher.getPhoneNumber().getPrefix());
+                    watcherDto.setPhoneNumber(watcher.getPhoneNumber().getNumber());
+                }
+                return watcherDto;
+            }).collect(Collectors.toList());
+            epicDto.setWatchers(watchers);
 
             return ResponseEntity.ok(epicDto);
         }
@@ -238,5 +258,99 @@ public class EpicController {
         } catch (EpicDoesNotExistException exception) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PutMapping("/{id}/watcher")
+    public ResponseEntity<Void> addWatcher(@PathVariable long id, @RequestBody WatcherDto dto) {
+        try {
+            Epic epic = findEpicBy(id);
+
+            try {
+                User user = findUserBy(dto.getId());
+                Watcher watcher = new Watcher();
+                watcher.setFirstName(user.getUserName().getFirstName());
+                watcher.setLastName(user.getUserName().getLastName());
+
+                if (user.getEmailAddress() != null) {
+                    EmailAddress emailAddress = new EmailAddress();
+                    emailAddress.setEmailAddress(user.getEmailAddress().getEmailAddress());
+                    watcher.setEmailAddress(emailAddress);
+                }
+
+                if (user.getPhoneNumber() != null) {
+                    PhoneNumber phoneNumber = new PhoneNumber();
+                    phoneNumber.setPrefix(user.getPhoneNumber().getPrefix());
+                    phoneNumber.setNumber(user.getPhoneNumber().getNumber());
+                    watcher.setPhoneNumber(phoneNumber);
+                }
+                epic.addWatcher(watcher);
+
+                epicRepository.save(epic);
+
+            } catch (UserNotFoundException exception) {
+                return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+            }
+
+            return ResponseEntity.ok().build();
+        } catch (EpicDoesNotExistException exception) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{epicId}/watcher/{watcherId}")
+    @Transactional
+    public ResponseEntity<Void> removeWatcher(@PathVariable Long epicId, @PathVariable Long watcherId) {
+        try {
+            Epic epic = findEpicBy(epicId);
+            User user = findUserBy(watcherId);
+
+            Watcher watcher = new Watcher();
+
+            if (user.getPhoneNumber() != null) {
+                PhoneNumber phoneNumber = new PhoneNumber();
+                phoneNumber.setPrefix(user.getPhoneNumber().getPrefix());
+                phoneNumber.setNumber(user.getPhoneNumber().getNumber());
+                watcher.setPhoneNumber(phoneNumber);
+            }
+
+            watcher.setFirstName(user.getUserName().getFirstName());
+            watcher.setLastName(user.getUserName().getLastName());
+
+            if (user.getEmailAddress() != null) {
+                EmailAddress emailAddress = new EmailAddress();
+                emailAddress.setEmailAddress(user.getEmailAddress().getEmailAddress());
+                watcher.setEmailAddress(emailAddress);
+            }
+
+            epic.removeWatcher(watcher);
+
+            epicRepository.save(epic);
+
+            return ResponseEntity.ok().build();
+        } catch (EpicDoesNotExistException exception) {
+            return ResponseEntity.notFound().build();
+        } catch (UserNotFoundException exception) {
+            return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+        }
+    }
+
+    private Epic findEpicBy(long id) {
+        Optional<Epic> found = epicRepository.findById(id);
+
+        if (found.isEmpty()) {
+            throw new EpicDoesNotExistException();
+        }
+
+        return found.get();
+    }
+
+    private User findUserBy(Long id) {
+        Optional<User> found = userRepository.findById(id);
+
+        if (found.isEmpty()) {
+            throw new UserNotFoundException();
+        }
+
+        return found.get();
     }
 }

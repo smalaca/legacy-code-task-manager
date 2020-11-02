@@ -1,13 +1,17 @@
 package com.smalaca.taskamanager.model.entities;
 
 import com.smalaca.taskamanager.model.embedded.Owner;
+import com.smalaca.taskamanager.model.embedded.Watcher;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.TO_BE_DEFINED;
 
@@ -28,6 +32,9 @@ public class Epic {
 
     @ManyToOne
     private Project project;
+
+    @ElementCollection
+    private List<Watcher> watchers = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -71,5 +78,20 @@ public class Epic {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public List<Watcher> getWatchers() {
+        return watchers;
+    }
+
+    public void addWatcher(Watcher watcher) {
+        watchers.add(watcher);
+    }
+
+    public void removeWatcher(Watcher watcher) {
+        if (!watchers.contains(watcher)) {
+            throw new RuntimeException();
+        }
+        watchers.remove(watcher);
     }
 }

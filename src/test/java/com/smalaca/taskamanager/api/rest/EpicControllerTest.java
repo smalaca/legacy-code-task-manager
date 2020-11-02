@@ -1,10 +1,12 @@
 package com.smalaca.taskamanager.api.rest;
 
 import com.smalaca.taskamanager.dto.EpicDto;
+import com.smalaca.taskamanager.dto.WatcherDto;
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.Owner;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
 import com.smalaca.taskamanager.model.embedded.UserName;
+import com.smalaca.taskamanager.model.embedded.Watcher;
 import com.smalaca.taskamanager.model.entities.Epic;
 import com.smalaca.taskamanager.model.entities.Project;
 import com.smalaca.taskamanager.model.entities.User;
@@ -37,14 +39,21 @@ class EpicControllerTest {
     private static final String EMAIL_ADDRESS = "nick.fury@shield.marvel.com";
     private static final String PHONE_PREFIX = "567";
     private static final String PHONE_NUMBER = "133131313";
+    private static final String ANOTHER_FIRST_NAME = "Maria";
+    private static final String ANOTHER_LAST_NAME = "Hill";
+    private static final String ANOTHER_EMAIL_ADDRESS = "maria.hill@shield.com";
+    private static final String ANOTHER_PHONE_PREFIX = "909";
+    private static final String ANOTHER_PHONE_NUMBER = "982478438743";
     private static final long EPIC_ID = 13;
     private static final long OWNER_ID = 42;
     private static final long PROJECT_ID = 69;
+    private static final long WATCHER_ID = 5;
 
     private final EpicRepository epicRepository = mock(EpicRepository.class);
     private final UserRepository userRepository = mock(UserRepository.class);
     private final ProjectRepository projectRepository = mock(ProjectRepository.class);
     private final EpicController controller = new EpicController(epicRepository, userRepository, projectRepository);
+    private final ArgumentCaptor<Epic> epicCaptor = ArgumentCaptor.forClass(Epic.class);
 
     @Test
     void shouldNotFindEpic() {
@@ -73,6 +82,15 @@ class EpicControllerTest {
         assertThat(dto.getOwnerPhoneNumberPrefix()).isEqualTo(PHONE_PREFIX);
         assertThat(dto.getOwnerPhoneNumberNumber()).isEqualTo(PHONE_NUMBER);
         assertThat(dto.getProjectId()).isEqualTo(PROJECT_ID);
+        assertThat(dto.getWatchers())
+                .hasSize(1)
+                .anySatisfy(watcherDto -> {
+                    assertThat(watcherDto.getFirstName()).isEqualTo(ANOTHER_FIRST_NAME);
+                    assertThat(watcherDto.getLastName()).isEqualTo(ANOTHER_LAST_NAME);
+                    assertThat(watcherDto.getEmailAddress()).isEqualTo(ANOTHER_EMAIL_ADDRESS);
+                    assertThat(watcherDto.getPhonePrefix()).isEqualTo(ANOTHER_PHONE_PREFIX);
+                    assertThat(watcherDto.getPhoneNumber()).isEqualTo(ANOTHER_PHONE_NUMBER);
+                });
     }
 
     private Epic existingEpic() {
@@ -88,6 +106,7 @@ class EpicControllerTest {
         phoneNumber.setNumber(PHONE_NUMBER);
         owner.setPhoneNumber(phoneNumber);
         epic.setOwner(owner);
+        epic.addWatcher(watcher());
 
         return epic;
     }
@@ -125,9 +144,8 @@ class EpicControllerTest {
 
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(actual.getBody()).isEqualTo(EPIC_ID);
-        ArgumentCaptor<Epic> captor = ArgumentCaptor.forClass(Epic.class);
-        then(epicRepository).should().save(captor.capture());
-        Epic epic = captor.getValue();
+        then(epicRepository).should().save(epicCaptor.capture());
+        Epic epic = epicCaptor.getValue();
         assertThat(epic.getTitle()).isEqualTo(TITLE);
         assertThat(epic.getDescription()).isEqualTo(DESCRIPTION);
         assertThat(epic.getStatus()).isEqualTo(STATUS);
@@ -178,9 +196,8 @@ class EpicControllerTest {
         ResponseEntity<Void> actual = controller.update(EPIC_ID, updateEpicDto());
 
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
-        ArgumentCaptor<Epic> captor = ArgumentCaptor.forClass(Epic.class);
-        then(epicRepository).should().save(captor.capture());
-        Epic epic = captor.getValue();
+        then(epicRepository).should().save(epicCaptor.capture());
+        Epic epic = epicCaptor.getValue();
         assertThat(epic.getTitle()).isEqualTo(TITLE);
         assertThat(epic.getDescription()).isEqualTo("new description");
         assertThat(epic.getStatus()).isEqualTo(TO_BE_DEFINED);
@@ -202,9 +219,8 @@ class EpicControllerTest {
         ResponseEntity<Void> actual = controller.update(EPIC_ID, updateEpicDto());
 
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
-        ArgumentCaptor<Epic> captor = ArgumentCaptor.forClass(Epic.class);
-        then(epicRepository).should().save(captor.capture());
-        Epic epic = captor.getValue();
+        then(epicRepository).should().save(epicCaptor.capture());
+        Epic epic = epicCaptor.getValue();
         assertThat(epic.getTitle()).isEqualTo(TITLE);
         assertThat(epic.getDescription()).isEqualTo("new description");
         assertThat(epic.getStatus()).isEqualTo(TO_BE_DEFINED);
@@ -268,9 +284,111 @@ class EpicControllerTest {
         ResponseEntity<Void> actual = controller.delete(EPIC_ID);
 
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
-        ArgumentCaptor<Epic> captor = ArgumentCaptor.forClass(Epic.class);
-        then(epicRepository).should().delete(captor.capture());
-        assertThat(captor.getValue().getId()).isEqualTo(EPIC_ID);
+        then(epicRepository).should().delete(epicCaptor.capture());
+        assertThat(epicCaptor.getValue().getId()).isEqualTo(EPIC_ID);
+    }
+
+    @Test
+    void shouldNotAddWatcherToNotExistingEpic() {
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.empty());
+
+        ResponseEntity<Void> actual = controller.addWatcher(EPIC_ID, watcherDto());
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void shouldNotAddNotExistingWatcherToEpic() {
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.of(epicWithId()));
+        given(userRepository.findById(WATCHER_ID)).willReturn(Optional.empty());
+
+        ResponseEntity<Void> actual = controller.addWatcher(EPIC_ID, watcherDto());
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.FAILED_DEPENDENCY);
+    }
+
+    @Test
+    void shouldAddWatcherToEpic() {
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.of(epicWithId()));
+        given(userRepository.findById(WATCHER_ID)).willReturn(Optional.of(userWithId(WATCHER_ID)));
+
+        ResponseEntity<Void> actual = controller.addWatcher(EPIC_ID, watcherDto());
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        then(epicRepository).should().save(epicCaptor.capture());
+        assertThat(epicCaptor.getValue().getWatchers())
+                .hasSize(1)
+                .anySatisfy(watcher -> {
+                    assertThat(watcher.getFirstName()).isEqualTo(ANOTHER_FIRST_NAME);
+                    assertThat(watcher.getLastName()).isEqualTo(ANOTHER_LAST_NAME);
+                    assertThat(watcher.getEmailAddress().getEmailAddress()).isEqualTo(ANOTHER_EMAIL_ADDRESS);
+                    assertThat(watcher.getPhoneNumber().getPrefix()).isEqualTo(ANOTHER_PHONE_PREFIX);
+                    assertThat(watcher.getPhoneNumber().getNumber()).isEqualTo(ANOTHER_PHONE_NUMBER);
+                });
+    }
+
+    @Test
+    void shouldNotRemoveWatcherFromNotExistingEpic() {
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.empty());
+
+        ResponseEntity<Void> actual = controller.removeWatcher(EPIC_ID, WATCHER_ID);
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+
+    }
+
+    @Test
+    void shouldNotRemoveNotExistingWatcherFromEpic() {
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.of(epicWithWatcher()));
+        given(userRepository.findById(WATCHER_ID)).willReturn(Optional.empty());
+
+        ResponseEntity<Void> actual = controller.removeWatcher(EPIC_ID, WATCHER_ID);
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.FAILED_DEPENDENCY);
+    }
+
+    @Test
+    void shouldRemoveWatcherFromEpic() {
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.of(epicWithWatcher()));
+        given(userRepository.findById(WATCHER_ID)).willReturn(Optional.of(userWithId(WATCHER_ID)));
+
+        ResponseEntity<Void> actual = controller.removeWatcher(EPIC_ID, WATCHER_ID);
+
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        then(epicRepository).should().save(epicCaptor.capture());
+        assertThat(epicCaptor.getValue().getWatchers()).isEmpty();
+    }
+
+    private Epic epicWithWatcher() {
+        Epic epic = epicWithId();
+        epic.addWatcher(watcher());
+
+        return epic;
+    }
+
+    private Watcher watcher() {
+        Watcher watcher = new Watcher();
+        watcher.setFirstName(ANOTHER_FIRST_NAME);
+        watcher.setLastName(ANOTHER_LAST_NAME);
+        EmailAddress emailAddress = new EmailAddress();
+        emailAddress.setEmailAddress(ANOTHER_EMAIL_ADDRESS);
+        watcher.setEmailAddress(emailAddress);
+        PhoneNumber phoneNumber = new PhoneNumber();
+        phoneNumber.setPrefix(ANOTHER_PHONE_PREFIX);
+        phoneNumber.setNumber(ANOTHER_PHONE_NUMBER);
+        watcher.setPhoneNumber(phoneNumber);
+        return watcher;
+    }
+
+    private WatcherDto watcherDto() {
+        WatcherDto dto = new WatcherDto();
+        dto.setId(WATCHER_ID);
+        return dto;
+    }
+
+    private User userWithId(long userId) {
+        return user(userId, ANOTHER_FIRST_NAME, ANOTHER_LAST_NAME, ANOTHER_EMAIL_ADDRESS, ANOTHER_PHONE_PREFIX, ANOTHER_PHONE_NUMBER);
     }
 
     private Epic epicWithId() {
@@ -283,17 +401,21 @@ class EpicControllerTest {
     }
 
     private User owner() {
-        User user = withId(new User(), OWNER_ID);
+        return user(OWNER_ID, FIRST_NAME, LAST_NAME, EMAIL_ADDRESS, PHONE_PREFIX, PHONE_NUMBER);
+    }
+
+    private User user(long id, String firstName, String lastName, String email, String prefix, String number) {
+        User user = withId(new User(), id);
         UserName userName = new UserName();
-        userName.setFirstName(FIRST_NAME);
-        userName.setLastName(LAST_NAME);
+        userName.setFirstName(firstName);
+        userName.setLastName(lastName);
         user.setUserName(userName);
         EmailAddress emailAddress = new EmailAddress();
-        emailAddress.setEmailAddress(EMAIL_ADDRESS);
+        emailAddress.setEmailAddress(email);
         user.setEmailAddress(emailAddress);
         PhoneNumber phoneNumber = new PhoneNumber();
-        phoneNumber.setPrefix(PHONE_PREFIX);
-        phoneNumber.setNumber(PHONE_NUMBER);
+        phoneNumber.setPrefix(prefix);
+        phoneNumber.setNumber(number);
         user.setPhoneNumber(phoneNumber);
         return user;
     }
