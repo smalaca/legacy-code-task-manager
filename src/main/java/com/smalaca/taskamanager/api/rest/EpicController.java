@@ -2,6 +2,7 @@ package com.smalaca.taskamanager.api.rest;
 
 
 import com.smalaca.taskamanager.dto.EpicDto;
+import com.smalaca.taskamanager.dto.StakeholderDto;
 import com.smalaca.taskamanager.dto.WatcherDto;
 import com.smalaca.taskamanager.exception.EpicDoesNotExistException;
 import com.smalaca.taskamanager.exception.ProjectNotFoundException;
@@ -9,6 +10,7 @@ import com.smalaca.taskamanager.exception.UserNotFoundException;
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.Owner;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
+import com.smalaca.taskamanager.model.embedded.Stakeholder;
 import com.smalaca.taskamanager.model.embedded.Watcher;
 import com.smalaca.taskamanager.model.entities.Epic;
 import com.smalaca.taskamanager.model.entities.Project;
@@ -100,6 +102,21 @@ public class EpicController {
                 return watcherDto;
             }).collect(Collectors.toList());
             epicDto.setWatchers(watchers);
+
+            List<StakeholderDto> stakeholders = epic.getStakeholders().stream().map(stakeholder -> {
+                StakeholderDto stakeholderDto = new StakeholderDto();
+                stakeholderDto.setFirstName(stakeholder.getFirstName());
+                stakeholderDto.setLastName(stakeholder.getLastName());
+                if (stakeholder.getEmailAddress() != null) {
+                    stakeholderDto.setEmailAddress(stakeholder.getEmailAddress().getEmailAddress());
+                }
+                if (stakeholder.getPhoneNumber() != null) {
+                    stakeholderDto.setPhonePrefix(stakeholder.getPhoneNumber().getPrefix());
+                    stakeholderDto.setPhoneNumber(stakeholder.getPhoneNumber().getNumber());
+                }
+                return stakeholderDto;
+            }).collect(Collectors.toList());
+            epicDto.setStakeholders(stakeholders);
 
             return ResponseEntity.ok(epicDto);
         }
@@ -323,6 +340,80 @@ public class EpicController {
             }
 
             epic.removeWatcher(watcher);
+
+            epicRepository.save(epic);
+
+            return ResponseEntity.ok().build();
+        } catch (EpicDoesNotExistException exception) {
+            return ResponseEntity.notFound().build();
+        } catch (UserNotFoundException exception) {
+            return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+        }
+    }
+
+    @PutMapping("/{id}/stakeholder")
+    public ResponseEntity<Void> addStakeholder(@PathVariable long id, @RequestBody StakeholderDto dto) {
+        try {
+            Epic epic = findEpicBy(id);
+
+            try {
+                User user = findUserBy(dto.getId());
+                Stakeholder stakeholder = new Stakeholder();
+                stakeholder.setFirstName(user.getUserName().getFirstName());
+                stakeholder.setLastName(user.getUserName().getLastName());
+
+                if (user.getEmailAddress() != null) {
+                    EmailAddress emailAddress = new EmailAddress();
+                    emailAddress.setEmailAddress(user.getEmailAddress().getEmailAddress());
+                    stakeholder.setEmailAddress(emailAddress);
+                }
+
+                if (user.getPhoneNumber() != null) {
+                    PhoneNumber phoneNumber = new PhoneNumber();
+                    phoneNumber.setPrefix(user.getPhoneNumber().getPrefix());
+                    phoneNumber.setNumber(user.getPhoneNumber().getNumber());
+                    stakeholder.setPhoneNumber(phoneNumber);
+                }
+                epic.addStakeholder(stakeholder);
+
+                epicRepository.save(epic);
+
+            } catch (UserNotFoundException exception) {
+                return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+            }
+
+            return ResponseEntity.ok().build();
+        } catch (EpicDoesNotExistException exception) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{epicId}/stakeholder/{stakeholderId}")
+    @Transactional
+    public ResponseEntity<Void> removeStakeholder(@PathVariable Long epicId, @PathVariable Long stakeholderId) {
+        try {
+            Epic epic = findEpicBy(epicId);
+            User user = findUserBy(stakeholderId);
+
+            Stakeholder stakeholder = new Stakeholder();
+
+            if (user.getPhoneNumber() != null) {
+                PhoneNumber phoneNumber = new PhoneNumber();
+                phoneNumber.setPrefix(user.getPhoneNumber().getPrefix());
+                phoneNumber.setNumber(user.getPhoneNumber().getNumber());
+                stakeholder.setPhoneNumber(phoneNumber);
+            }
+
+            stakeholder.setFirstName(user.getUserName().getFirstName());
+            stakeholder.setLastName(user.getUserName().getLastName());
+
+            if (user.getEmailAddress() != null) {
+                EmailAddress emailAddress = new EmailAddress();
+                emailAddress.setEmailAddress(user.getEmailAddress().getEmailAddress());
+                stakeholder.setEmailAddress(emailAddress);
+            }
+
+            epic.removeStakeholder(stakeholder);
 
             epicRepository.save(epic);
 

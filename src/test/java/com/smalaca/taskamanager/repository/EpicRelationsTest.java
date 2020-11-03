@@ -1,5 +1,6 @@
 package com.smalaca.taskamanager.repository;
 
+import com.smalaca.taskamanager.model.embedded.Stakeholder;
 import com.smalaca.taskamanager.model.embedded.Watcher;
 import com.smalaca.taskamanager.model.entities.Epic;
 import org.junit.jupiter.api.AfterEach;
@@ -34,10 +35,6 @@ class EpicRelationsTest {
                 .anySatisfy(hasWatcher("Natasha", "Romanoff"));
     }
 
-    private Epic findEpic(Epic epic) {
-        return repository.findById(epic.getId()).get();
-    }
-
     @Test
     void shouldRemoveWatchersFromEpic() {
         Epic epic = existingEpic("Empyre");
@@ -56,17 +53,6 @@ class EpicRelationsTest {
                 .anySatisfy(hasWatcher("Wanda", "Maximoff"));
     }
 
-    private Epic existingEpic(String title) {
-        Long id = repository.save(epic(title)).getId();
-        return repository.findById(id).get();
-    }
-
-    private Epic epic(String title) {
-        Epic epic = new Epic();
-        epic.setTitle(title);
-        return epic;
-    }
-
     private Watcher watcher(String firstName, String lastName) {
         Watcher watcher = new Watcher();
         watcher.setFirstName(firstName);
@@ -79,5 +65,66 @@ class EpicRelationsTest {
             assertThat(actual.getFirstName()).isEqualTo(firstName);
             assertThat(actual.getLastName()).isEqualTo(lastName);
         };
+    }
+
+    @Test
+    void shouldCreateAddStakeholdersToEpic() {
+        Epic epic = existingEpic("Empyre");
+
+        epic.addStakeholder(stakeholder("Steve", "Rogers"));
+        epic.addStakeholder(stakeholder("Natasha", "Romanoff"));
+        repository.save(epic);
+
+        assertThat(findEpic(epic).getStakeholders())
+                .hasSize(2)
+                .anySatisfy(hasStakeholder("Steve", "Rogers"))
+                .anySatisfy(hasStakeholder("Natasha", "Romanoff"));
+    }
+
+    @Test
+    void shouldRemoveStakeholdersFromEpic() {
+        Epic epic = existingEpic("Empyre");
+        epic.addStakeholder(stakeholder("Steve", "Rogers"));
+        epic.addStakeholder(stakeholder("Natasha", "Romanoff"));
+        epic.addStakeholder(stakeholder("Wanda", "Maximoff"));
+        repository.save(epic);
+
+        Epic saved = findEpic(epic);
+        saved.removeStakeholder(stakeholder("Natasha", "Romanoff"));
+        repository.save(saved);
+
+        assertThat(findEpic(epic).getStakeholders())
+                .hasSize(2)
+                .anySatisfy(hasStakeholder("Steve", "Rogers"))
+                .anySatisfy(hasStakeholder("Wanda", "Maximoff"));
+    }
+
+    private Stakeholder stakeholder(String firstName, String lastName) {
+        Stakeholder stakeholder = new Stakeholder();
+        stakeholder.setFirstName(firstName);
+        stakeholder.setLastName(lastName);
+        return stakeholder;
+    }
+
+    private Consumer<Stakeholder> hasStakeholder(String firstName, String lastName) {
+        return actual -> {
+            assertThat(actual.getFirstName()).isEqualTo(firstName);
+            assertThat(actual.getLastName()).isEqualTo(lastName);
+        };
+    }
+
+    private Epic findEpic(Epic epic) {
+        return repository.findById(epic.getId()).get();
+    }
+
+    private Epic existingEpic(String title) {
+        Long id = repository.save(epic(title)).getId();
+        return repository.findById(id).get();
+    }
+
+    private Epic epic(String title) {
+        Epic epic = new Epic();
+        epic.setTitle(title);
+        return epic;
     }
 }

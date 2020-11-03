@@ -1,10 +1,12 @@
 package com.smalaca.taskamanager.api.rest;
 
 import com.smalaca.taskamanager.dto.EpicDto;
+import com.smalaca.taskamanager.dto.StakeholderDto;
 import com.smalaca.taskamanager.dto.WatcherDto;
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.Owner;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
+import com.smalaca.taskamanager.model.embedded.Stakeholder;
 import com.smalaca.taskamanager.model.embedded.UserName;
 import com.smalaca.taskamanager.model.embedded.Watcher;
 import com.smalaca.taskamanager.model.entities.Epic;
@@ -48,6 +50,7 @@ class EpicControllerTest {
     private static final long OWNER_ID = 42;
     private static final long PROJECT_ID = 69;
     private static final long WATCHER_ID = 5;
+    private static final long STAKEHOLDER_ID = 17;
 
     private final EpicRepository epicRepository = mock(EpicRepository.class);
     private final UserRepository userRepository = mock(UserRepository.class);
@@ -91,6 +94,15 @@ class EpicControllerTest {
                     assertThat(watcherDto.getPhonePrefix()).isEqualTo(ANOTHER_PHONE_PREFIX);
                     assertThat(watcherDto.getPhoneNumber()).isEqualTo(ANOTHER_PHONE_NUMBER);
                 });
+        assertThat(dto.getStakeholders())
+                .hasSize(1)
+                .anySatisfy(stakeholderDto -> {
+                    assertThat(stakeholderDto.getFirstName()).isEqualTo(ANOTHER_FIRST_NAME);
+                    assertThat(stakeholderDto.getLastName()).isEqualTo(ANOTHER_LAST_NAME);
+                    assertThat(stakeholderDto.getEmailAddress()).isEqualTo(ANOTHER_EMAIL_ADDRESS);
+                    assertThat(stakeholderDto.getPhonePrefix()).isEqualTo(ANOTHER_PHONE_PREFIX);
+                    assertThat(stakeholderDto.getPhoneNumber()).isEqualTo(ANOTHER_PHONE_NUMBER);
+                });
     }
 
     private Epic existingEpic() {
@@ -107,6 +119,7 @@ class EpicControllerTest {
         owner.setPhoneNumber(phoneNumber);
         epic.setOwner(owner);
         epic.addWatcher(watcher());
+        epic.addStakeholder(stakeholder());
 
         return epic;
     }
@@ -384,6 +397,105 @@ class EpicControllerTest {
     private WatcherDto watcherDto() {
         WatcherDto dto = new WatcherDto();
         dto.setId(WATCHER_ID);
+        return dto;
+    }
+
+    @Test
+    void shouldNotAddStakeholderToNotExistingEpic() {
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.empty());
+
+        ResponseEntity<Void> actual = controller.addStakeholder(EPIC_ID, stakeholderDto());
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void shouldNotAddNotExistingStakeholderToEpic() {
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.of(epicWithId()));
+        given(userRepository.findById(STAKEHOLDER_ID)).willReturn(Optional.empty());
+
+        ResponseEntity<Void> actual = controller.addStakeholder(EPIC_ID, stakeholderDto());
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.FAILED_DEPENDENCY);
+    }
+
+    @Test
+    void shouldAddStakeholderToEpic() {
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.of(epicWithId()));
+        given(userRepository.findById(STAKEHOLDER_ID)).willReturn(Optional.of(userWithId(STAKEHOLDER_ID)));
+
+        ResponseEntity<Void> actual = controller.addStakeholder(EPIC_ID, stakeholderDto());
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        then(epicRepository).should().save(epicCaptor.capture());
+        assertThat(epicCaptor.getValue().getStakeholders())
+                .hasSize(1)
+                .anySatisfy(stakeholder -> {
+                    assertThat(stakeholder.getFirstName()).isEqualTo(ANOTHER_FIRST_NAME);
+                    assertThat(stakeholder.getLastName()).isEqualTo(ANOTHER_LAST_NAME);
+                    assertThat(stakeholder.getEmailAddress().getEmailAddress()).isEqualTo(ANOTHER_EMAIL_ADDRESS);
+                    assertThat(stakeholder.getPhoneNumber().getPrefix()).isEqualTo(ANOTHER_PHONE_PREFIX);
+                    assertThat(stakeholder.getPhoneNumber().getNumber()).isEqualTo(ANOTHER_PHONE_NUMBER);
+                });
+    }
+
+    @Test
+    void shouldNotRemoveStakeholderFromNotExistingEpic() {
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.empty());
+
+        ResponseEntity<Void> actual = controller.removeStakeholder(EPIC_ID, STAKEHOLDER_ID);
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+
+    }
+
+    @Test
+    void shouldNotRemoveNotExistingStakeholderFromEpic() {
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.of(epicWithStakeholder()));
+        given(userRepository.findById(STAKEHOLDER_ID)).willReturn(Optional.empty());
+
+        ResponseEntity<Void> actual = controller.removeStakeholder(EPIC_ID, STAKEHOLDER_ID);
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.FAILED_DEPENDENCY);
+    }
+
+    @Test
+    void shouldRemoveStakeholderFromEpic() {
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.of(epicWithStakeholder()));
+        given(userRepository.findById(STAKEHOLDER_ID)).willReturn(Optional.of(userWithId(STAKEHOLDER_ID)));
+
+        ResponseEntity<Void> actual = controller.removeStakeholder(EPIC_ID, STAKEHOLDER_ID);
+
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        then(epicRepository).should().save(epicCaptor.capture());
+        assertThat(epicCaptor.getValue().getStakeholders()).isEmpty();
+    }
+
+    private Epic epicWithStakeholder() {
+        Epic epic = epicWithId();
+        epic.addStakeholder(stakeholder());
+
+        return epic;
+    }
+
+    private Stakeholder stakeholder() {
+        Stakeholder stakeholder = new Stakeholder();
+        stakeholder.setFirstName(ANOTHER_FIRST_NAME);
+        stakeholder.setLastName(ANOTHER_LAST_NAME);
+        EmailAddress emailAddress = new EmailAddress();
+        emailAddress.setEmailAddress(ANOTHER_EMAIL_ADDRESS);
+        stakeholder.setEmailAddress(emailAddress);
+        PhoneNumber phoneNumber = new PhoneNumber();
+        phoneNumber.setPrefix(ANOTHER_PHONE_PREFIX);
+        phoneNumber.setNumber(ANOTHER_PHONE_NUMBER);
+        stakeholder.setPhoneNumber(phoneNumber);
+        return stakeholder;
+    }
+
+    private StakeholderDto stakeholderDto() {
+        StakeholderDto dto = new StakeholderDto();
+        dto.setId(STAKEHOLDER_ID);
         return dto;
     }
 
