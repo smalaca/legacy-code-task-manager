@@ -1,12 +1,15 @@
 package com.smalaca.taskamanager.api.rest;
 
 
+import com.smalaca.taskamanager.dto.AssigneeDto;
 import com.smalaca.taskamanager.dto.EpicDto;
 import com.smalaca.taskamanager.dto.StakeholderDto;
 import com.smalaca.taskamanager.dto.WatcherDto;
 import com.smalaca.taskamanager.exception.EpicDoesNotExistException;
 import com.smalaca.taskamanager.exception.ProjectNotFoundException;
+import com.smalaca.taskamanager.exception.TeamNotFoundException;
 import com.smalaca.taskamanager.exception.UserNotFoundException;
+import com.smalaca.taskamanager.model.embedded.Assignee;
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.Owner;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
@@ -14,10 +17,12 @@ import com.smalaca.taskamanager.model.embedded.Stakeholder;
 import com.smalaca.taskamanager.model.embedded.Watcher;
 import com.smalaca.taskamanager.model.entities.Epic;
 import com.smalaca.taskamanager.model.entities.Project;
+import com.smalaca.taskamanager.model.entities.Team;
 import com.smalaca.taskamanager.model.entities.User;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 import com.smalaca.taskamanager.repository.EpicRepository;
 import com.smalaca.taskamanager.repository.ProjectRepository;
+import com.smalaca.taskamanager.repository.TeamRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,15 +42,18 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/epic")
-@SuppressWarnings({"checkstyle:ClassFanOutComplexity", "checkstyle:NestedIfDepth", "PMD.CollapsibleIfStatements"})
+@SuppressWarnings({"checkstyle:ClassFanOutComplexity", "checkstyle:NestedTryDepth", "checkstyle:NestedIfDepth", "PMD.CollapsibleIfStatements"})
 public class EpicController {
     private final EpicRepository epicRepository;
     private final UserRepository userRepository;
+    private final TeamRepository teamRepository;
     private final ProjectRepository projectRepository;
 
-    public EpicController(EpicRepository epicRepository, UserRepository userRepository, ProjectRepository projectRepository) {
+    public EpicController(
+            EpicRepository epicRepository, UserRepository userRepository, TeamRepository teamRepository, ProjectRepository projectRepository) {
         this.epicRepository = epicRepository;
         this.userRepository = userRepository;
+        this.teamRepository = teamRepository;
         this.projectRepository = projectRepository;
     }
 
@@ -102,6 +110,14 @@ public class EpicController {
                 return watcherDto;
             }).collect(Collectors.toList());
             epicDto.setWatchers(watchers);
+            
+            if (epic.getAssignee() != null) {
+                AssigneeDto assigneeDto = new AssigneeDto();
+                assigneeDto.setFirstName(epic.getAssignee().getFirstName());
+                assigneeDto.setLastName(epic.getAssignee().getLastName());
+                assigneeDto.setTeamId(epic.getAssignee().getTeamId());
+                epicDto.setAssignee(assigneeDto);
+            }
 
             List<StakeholderDto> stakeholders = epic.getStakeholders().stream().map(stakeholder -> {
                 StakeholderDto stakeholderDto = new StakeholderDto();
@@ -422,6 +438,59 @@ public class EpicController {
             return ResponseEntity.notFound().build();
         } catch (UserNotFoundException exception) {
             return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+        }
+    }
+
+    @PutMapping("/{id}/assignee")
+    public ResponseEntity<Void> addAssignee(@PathVariable long id, @RequestBody AssigneeDto dto) {
+        try {
+            Epic epic = findEpicBy(id);
+
+            try {
+                User user = findUserBy(dto.getId());
+                Assignee assignee = new Assignee();
+                assignee.setFirstName(user.getUserName().getFirstName());
+                assignee.setLastName(user.getUserName().getLastName());
+
+                try {
+                    findTeamBy(dto.getTeamId());
+                    assignee.setTeamId(dto.getTeamId());
+                    epic.setAssignee(assignee);
+                    epicRepository.save(epic);
+                } catch (TeamNotFoundException exception) {
+                    return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+                }
+
+            } catch (UserNotFoundException exception) {
+                return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+            }
+
+            return ResponseEntity.ok().build();
+        } catch (EpicDoesNotExistException exception) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    private void findTeamBy(Long id) {
+        Optional<Team> found = teamRepository.findById(id);
+
+        if (found.isEmpty()) {
+            throw new TeamNotFoundException();
+        }
+    }
+
+    @DeleteMapping("/{epicId}/assignee")
+    @Transactional
+    public ResponseEntity<Void> removeAssignee(@PathVariable Long epicId) {
+        try {
+            Epic epic = findEpicBy(epicId);
+            epic.setAssignee(null);
+
+            epicRepository.save(epic);
+
+            return ResponseEntity.ok().build();
+        } catch (EpicDoesNotExistException exception) {
+            return ResponseEntity.notFound().build();
         }
     }
 

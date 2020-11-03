@@ -1,5 +1,6 @@
 package com.smalaca.taskamanager.model.entities;
 
+import com.smalaca.taskamanager.model.embedded.Assignee;
 import com.smalaca.taskamanager.model.embedded.Stakeholder;
 import com.smalaca.taskamanager.model.embedded.Watcher;
 import org.junit.jupiter.api.Test;
@@ -8,6 +9,32 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EpicTest {
+    @Test
+    void shouldCreateEpicWithAssignee() {
+        Epic epic = new Epic();
+        epic.setAssignee(assignee("Tony", "Stark"));
+
+        assertThat(epic.getAssignee().getFirstName()).isEqualTo("Tony");
+        assertThat(epic.getAssignee().getLastName()).isEqualTo("Stark");
+    }
+
+    @Test
+    void shouldUnsetAssigneeFromEpic() {
+        Epic epic = new Epic();
+        epic.setAssignee(assignee("Tony", "Stark"));
+
+        epic.setAssignee(null);
+
+        assertThat(epic.getAssignee()).isNull();
+    }
+
+    private Assignee assignee(String firstName, String lastName) {
+        Assignee assignee = new Assignee();
+        assignee.setFirstName(firstName);
+        assignee.setLastName(lastName);
+        return assignee;
+    }
+
     @Test
     void shouldCreateEpicWithWatchers() {
         Epic epic = new Epic();
@@ -48,6 +75,7 @@ class EpicTest {
         watcher.setLastName(lastName);
         return watcher;
     }
+
     @Test
     void shouldCreateEpicWithStakeholders() {
         Epic epic = new Epic();

@@ -1,5 +1,6 @@
 package com.smalaca.taskamanager.model.entities;
 
+import com.smalaca.taskamanager.model.embedded.Assignee;
 import com.smalaca.taskamanager.model.embedded.Owner;
 import com.smalaca.taskamanager.model.embedded.Stakeholder;
 import com.smalaca.taskamanager.model.embedded.Watcher;
@@ -39,6 +40,9 @@ public class Epic {
 
     @ElementCollection
     private List<Stakeholder> stakeholders = new ArrayList<>();
+
+    @Embedded
+    private Assignee assignee;
 
     public Long getId() {
         return id;
@@ -112,5 +116,13 @@ public class Epic {
             throw new RuntimeException();
         }
         stakeholders.remove(stakeholder);
+    }
+
+    public Assignee getAssignee() {
+        return assignee;
+    }
+
+    public void setAssignee(Assignee assignee) {
+        this.assignee = assignee;
     }
 }

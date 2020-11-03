@@ -1,8 +1,10 @@
 package com.smalaca.taskamanager.api.rest;
 
+import com.smalaca.taskamanager.dto.AssigneeDto;
 import com.smalaca.taskamanager.dto.EpicDto;
 import com.smalaca.taskamanager.dto.StakeholderDto;
 import com.smalaca.taskamanager.dto.WatcherDto;
+import com.smalaca.taskamanager.model.embedded.Assignee;
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.Owner;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
@@ -11,10 +13,12 @@ import com.smalaca.taskamanager.model.embedded.UserName;
 import com.smalaca.taskamanager.model.embedded.Watcher;
 import com.smalaca.taskamanager.model.entities.Epic;
 import com.smalaca.taskamanager.model.entities.Project;
+import com.smalaca.taskamanager.model.entities.Team;
 import com.smalaca.taskamanager.model.entities.User;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 import com.smalaca.taskamanager.repository.EpicRepository;
 import com.smalaca.taskamanager.repository.ProjectRepository;
+import com.smalaca.taskamanager.repository.TeamRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -51,11 +55,14 @@ class EpicControllerTest {
     private static final long PROJECT_ID = 69;
     private static final long WATCHER_ID = 5;
     private static final long STAKEHOLDER_ID = 17;
+    private static final long TEAM_ID = 987;
+    private static final long ASSIGNEE_ID = 476;
 
     private final EpicRepository epicRepository = mock(EpicRepository.class);
     private final UserRepository userRepository = mock(UserRepository.class);
+    private final TeamRepository teamRepository = mock(TeamRepository.class);
     private final ProjectRepository projectRepository = mock(ProjectRepository.class);
-    private final EpicController controller = new EpicController(epicRepository, userRepository, projectRepository);
+    private final EpicController controller = new EpicController(epicRepository, userRepository, teamRepository, projectRepository);
     private final ArgumentCaptor<Epic> epicCaptor = ArgumentCaptor.forClass(Epic.class);
 
     @Test
@@ -103,6 +110,9 @@ class EpicControllerTest {
                     assertThat(stakeholderDto.getPhonePrefix()).isEqualTo(ANOTHER_PHONE_PREFIX);
                     assertThat(stakeholderDto.getPhoneNumber()).isEqualTo(ANOTHER_PHONE_NUMBER);
                 });
+        assertThat(dto.getAssignee().getFirstName()).isEqualTo(ANOTHER_FIRST_NAME);
+        assertThat(dto.getAssignee().getLastName()).isEqualTo(ANOTHER_LAST_NAME);
+        assertThat(dto.getAssignee().getTeamId()).isEqualTo(TEAM_ID);
     }
 
     private Epic existingEpic() {
@@ -120,6 +130,7 @@ class EpicControllerTest {
         epic.setOwner(owner);
         epic.addWatcher(watcher());
         epic.addStakeholder(stakeholder());
+        epic.setAssignee(assignee());
 
         return epic;
     }
@@ -446,7 +457,6 @@ class EpicControllerTest {
         ResponseEntity<Void> actual = controller.removeStakeholder(EPIC_ID, STAKEHOLDER_ID);
 
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-
     }
 
     @Test
@@ -465,7 +475,6 @@ class EpicControllerTest {
         given(userRepository.findById(STAKEHOLDER_ID)).willReturn(Optional.of(userWithId(STAKEHOLDER_ID)));
 
         ResponseEntity<Void> actual = controller.removeStakeholder(EPIC_ID, STAKEHOLDER_ID);
-
 
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
         then(epicRepository).should().save(epicCaptor.capture());
@@ -497,6 +506,97 @@ class EpicControllerTest {
         StakeholderDto dto = new StakeholderDto();
         dto.setId(STAKEHOLDER_ID);
         return dto;
+    }
+
+    @Test
+    void shouldNotAddAssigneeToNotExistingEpic() {
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.empty());
+
+        ResponseEntity<Void> actual = controller.addAssignee(EPIC_ID, assigneeDto());
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void shouldNotAddNotExistingAssigneeToEpic() {
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.of(epicWithId()));
+        given(userRepository.findById(ASSIGNEE_ID)).willReturn(Optional.empty());
+
+        ResponseEntity<Void> actual = controller.addAssignee(EPIC_ID, assigneeDto());
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.FAILED_DEPENDENCY);
+    }
+
+    @Test
+    void shouldNotAddAssigneeWithNotExistingTeamToEpic() {
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.of(epicWithId()));
+        given(userRepository.findById(ASSIGNEE_ID)).willReturn(Optional.of(userWithId(ASSIGNEE_ID)));
+        given(teamRepository.findById(TEAM_ID)).willReturn(Optional.empty());
+
+        ResponseEntity<Void> actual = controller.addAssignee(EPIC_ID, assigneeDto());
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.FAILED_DEPENDENCY);
+    }
+
+    @Test
+    void shouldAddAssigneeToEpic() {
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.of(epicWithId()));
+        given(userRepository.findById(ASSIGNEE_ID)).willReturn(Optional.of(userWithId(ASSIGNEE_ID)));
+        given(teamRepository.findById(TEAM_ID)).willReturn(Optional.of(teamWithId(TEAM_ID)));
+
+        ResponseEntity<Void> actual = controller.addAssignee(EPIC_ID, assigneeDto());
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        then(epicRepository).should().save(epicCaptor.capture());
+        assertThat(epicCaptor.getValue().getAssignee().getFirstName()).isEqualTo(ANOTHER_FIRST_NAME);
+        assertThat(epicCaptor.getValue().getAssignee().getLastName()).isEqualTo(ANOTHER_LAST_NAME);
+        assertThat(epicCaptor.getValue().getAssignee().getTeamId()).isEqualTo(TEAM_ID);
+    }
+
+    @Test
+    void shouldNotRemoveAssigneeFromNotExistingEpic() {
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.empty());
+
+        ResponseEntity<Void> actual = controller.removeAssignee(EPIC_ID);
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void shouldRemoveAssigneeFromEpic() {
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.of(epicWithAssignee()));
+
+        ResponseEntity<Void> actual = controller.removeAssignee(EPIC_ID);
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        then(epicRepository).should().save(epicCaptor.capture());
+        assertThat(epicCaptor.getValue().getAssignee()).isNull();
+    }
+
+    private Epic epicWithAssignee() {
+        Epic epic = epicWithId();
+        epic.setAssignee(assignee());
+
+        return epic;
+    }
+
+    private Assignee assignee() {
+        Assignee assignee = new Assignee();
+        assignee.setFirstName(ANOTHER_FIRST_NAME);
+        assignee.setLastName(ANOTHER_LAST_NAME);
+        assignee.setTeamId(TEAM_ID);
+        return assignee;
+    }
+
+    private AssigneeDto assigneeDto() {
+        AssigneeDto dto = new AssigneeDto();
+        dto.setId(ASSIGNEE_ID);
+        dto.setTeamId(TEAM_ID);
+        return dto;
+    }
+
+    private Team teamWithId(long teamId) {
+        return withId(new Team(), teamId);
     }
 
     private User userWithId(long userId) {

@@ -1,5 +1,6 @@
 package com.smalaca.taskamanager.repository;
 
+import com.smalaca.taskamanager.model.embedded.Assignee;
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.Owner;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
@@ -53,6 +54,11 @@ class EpicRepositoryTest {
         project.setName("Mysterious Project");
         projectRepository.save(project).getId();
         epic.setProject(project);
+        Assignee assignee = new Assignee();
+        assignee.setFirstName("Winter");
+        assignee.setLastName("Soldier");
+        assignee.setTeamId(123L);
+        epic.setAssignee(assignee);
 
         Long id = epicRepository.save(epic).getId();
         Epic actual = epicRepository.findById(id).get();
@@ -66,6 +72,9 @@ class EpicRepositoryTest {
         assertThat(actual.getOwner().getPhoneNumber().getPrefix()).isEqualTo("5678");
         assertThat(actual.getOwner().getPhoneNumber().getNumber()).isEqualTo("1313131313");
         assertThat(actual.getProject().getName()).isEqualTo("Mysterious Project");
+        assertThat(actual.getAssignee().getFirstName()).isEqualTo("Winter");
+        assertThat(actual.getAssignee().getLastName()).isEqualTo("Soldier");
+        assertThat(actual.getAssignee().getTeamId()).isEqualTo(123L);
     }
 
     @Test
