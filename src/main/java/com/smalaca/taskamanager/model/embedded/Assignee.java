@@ -16,20 +16,20 @@ public class Assignee {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
     public String getLastName() {
         return lastName;
+    }
+
+    public Long getTeamId() {
+        return teamId;
     }
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
-    public Long getTeamId() {
-        return teamId;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     public void setTeamId(Long teamId) {
