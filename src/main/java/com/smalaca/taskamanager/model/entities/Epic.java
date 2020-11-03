@@ -1,6 +1,7 @@
 package com.smalaca.taskamanager.model.entities;
 
 import com.smalaca.taskamanager.model.embedded.Owner;
+import com.smalaca.taskamanager.model.embedded.Stakeholder;
 import com.smalaca.taskamanager.model.embedded.Watcher;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
 
@@ -35,6 +36,9 @@ public class Epic {
 
     @ElementCollection
     private List<Watcher> watchers = new ArrayList<>();
+
+    @ElementCollection
+    private List<Stakeholder> stakeholders = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -93,5 +97,20 @@ public class Epic {
             throw new RuntimeException();
         }
         watchers.remove(watcher);
+    }
+
+    public List<Stakeholder> getStakeholders() {
+        return stakeholders;
+    }
+
+    public void addStakeholder(Stakeholder stakeholder) {
+        stakeholders.add(stakeholder);
+    }
+
+    public void removeStakeholder(Stakeholder stakeholder) {
+        if (!stakeholders.contains(stakeholder)) {
+            throw new RuntimeException();
+        }
+        stakeholders.remove(stakeholder);
     }
 }
