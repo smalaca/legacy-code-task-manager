@@ -103,6 +103,21 @@ public class EpicController {
             }).collect(Collectors.toList());
             epicDto.setWatchers(watchers);
 
+            List<StakeholderDto> stakeholders = epic.getStakeholders().stream().map(stakeholder -> {
+                StakeholderDto stakeholderDto = new StakeholderDto();
+                stakeholderDto.setFirstName(stakeholder.getFirstName());
+                stakeholderDto.setLastName(stakeholder.getLastName());
+                if (stakeholder.getEmailAddress() != null) {
+                    stakeholderDto.setEmailAddress(stakeholder.getEmailAddress().getEmailAddress());
+                }
+                if (stakeholder.getPhoneNumber() != null) {
+                    stakeholderDto.setPhonePrefix(stakeholder.getPhoneNumber().getPrefix());
+                    stakeholderDto.setPhoneNumber(stakeholder.getPhoneNumber().getNumber());
+                }
+                return stakeholderDto;
+            }).collect(Collectors.toList());
+            epicDto.setStakeholders(stakeholders);
+
             return ResponseEntity.ok(epicDto);
         }
 

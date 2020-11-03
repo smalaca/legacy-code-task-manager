@@ -16,6 +16,7 @@ public class EpicDto {
     private String ownerEmailAddress;
     private Long projectId;
     private List<WatcherDto> watchers;
+    private List<StakeholderDto> stakeholders;
 
     public Long getId() {
         return id;
@@ -111,5 +112,13 @@ public class EpicDto {
 
     public void setWatchers(List<WatcherDto> watchers) {
         this.watchers = watchers;
+    }
+
+    public List<StakeholderDto> getStakeholders() {
+        return stakeholders;
+    }
+
+    public void setStakeholders(List<StakeholderDto> stakeholders) {
+        this.stakeholders = stakeholders;
     }
 }
