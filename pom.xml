@@ -305,7 +305,7 @@
                 <id>pit-report</id>
                 <phase>test</phase>
                 <goals>
-                  <goal>mutationCoverage</goal>
+                  <goal>scmMutationCoverage</goal>
                 </goals>
               </execution>
             </executions>
