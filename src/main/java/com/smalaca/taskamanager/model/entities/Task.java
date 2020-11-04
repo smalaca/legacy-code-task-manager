@@ -44,24 +44,20 @@ public class Task {
     @Embedded
     private Assignee assignee;
 
-    public Long getId() {
-        return id;
-    }
-
     public String getTitle() {
         return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public ToDoItemStatus getStatus() {
@@ -72,43 +68,36 @@ public class Task {
         this.status = status;
     }
 
-    public Owner getOwner() {
-        return owner;
-    }
-
     public void setOwner(Owner owner) {
         this.owner = owner;
     }
 
-    public Story getStory() {
-        return story;
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Owner getOwner() {
+        return owner;
     }
 
     public void setStory(Story story) {
         this.story = story;
     }
 
-    public List<Watcher> getWatchers() {
-        return watchers;
+    public void addStakeholder(Stakeholder stakeholder) {
+        stakeholders.add(stakeholder);
     }
 
     public void addWatcher(Watcher watcher) {
         watchers.add(watcher);
     }
 
-    public void removeWatcher(Watcher watcher) {
-        if (!watchers.contains(watcher)) {
-            throw new RuntimeException();
-        }
-        watchers.remove(watcher);
+    public List<Watcher> getWatchers() {
+        return watchers;
     }
 
-    public List<Stakeholder> getStakeholders() {
-        return stakeholders;
-    }
-
-    public void addStakeholder(Stakeholder stakeholder) {
-        stakeholders.add(stakeholder);
+    public Story getStory() {
+        return story;
     }
 
     public void removeStakeholder(Stakeholder stakeholder) {
@@ -118,11 +107,22 @@ public class Task {
         stakeholders.remove(stakeholder);
     }
 
-    public Assignee getAssignee() {
-        return assignee;
-    }
-
     public void setAssignee(Assignee assignee) {
         this.assignee = assignee;
+    }
+
+    public List<Stakeholder> getStakeholders() {
+        return stakeholders;
+    }
+
+    public void removeWatcher(Watcher watcher) {
+        if (!watchers.contains(watcher)) {
+            throw new RuntimeException();
+        }
+        watchers.remove(watcher);
+    }
+
+    public Assignee getAssignee() {
+        return assignee;
     }
 }
