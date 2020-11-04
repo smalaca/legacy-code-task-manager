@@ -88,12 +88,12 @@ public class Task {
         stakeholders.add(stakeholder);
     }
 
-    public void addWatcher(Watcher watcher) {
-        watchers.add(watcher);
-    }
-
     public List<Watcher> getWatchers() {
         return watchers;
+    }
+
+    public void addWatcher(Watcher watcher) {
+        watchers.add(watcher);
     }
 
     public Story getStory() {
