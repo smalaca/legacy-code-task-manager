@@ -30,6 +30,7 @@
     <pitest-maven.version>1.5.1</pitest-maven.version>
     <pitest-junit5-plugin.version>0.12</pitest-junit5-plugin.version>
     <commons-lang3.version>3.9</commons-lang3.version>
+    <maven-scm-plugin.version>1.11.2</maven-scm-plugin.version>
   </properties>
 
   <scm>
@@ -270,6 +271,15 @@
 
       <build>
         <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-scm-plugin</artifactId>
+            <version>${maven-scm-plugin.version}</version>
+            <configuration>
+              <connectionType>connection</connectionType>
+            </configuration>
+          </plugin>
+
           <plugin>
             <groupId>org.pitest</groupId>
             <artifactId>pitest-maven</artifactId>
