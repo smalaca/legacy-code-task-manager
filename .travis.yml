@@ -18,5 +18,5 @@ addons:
 script:
   - mvn -Pstatic-analysis clean compile
   - mvn -Pruntime-analysis verify
-  - mvn -Pmutation-tests -DskipTests org.pitest:pitest-maven:scmMutationCoverage
+  - mvn -Pmutation-tests org.pitest:pitest-maven:scmMutationCoverage
   - sonar-scanner
