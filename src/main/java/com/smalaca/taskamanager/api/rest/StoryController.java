@@ -14,6 +14,7 @@ import com.smalaca.taskamanager.model.embedded.EmailAddress;
 import com.smalaca.taskamanager.model.embedded.Owner;
 import com.smalaca.taskamanager.model.embedded.PhoneNumber;
 import com.smalaca.taskamanager.model.embedded.Stakeholder;
+import com.smalaca.taskamanager.model.embedded.UserName;
 import com.smalaca.taskamanager.model.embedded.Watcher;
 import com.smalaca.taskamanager.model.entities.Epic;
 import com.smalaca.taskamanager.model.entities.Story;
@@ -98,14 +99,16 @@ public class StoryController {
 
             List<WatcherDto> watchers = story.getWatchers().stream().map(watcher -> {
                 WatcherDto watcherDto = new WatcherDto();
+                if (watcher.getEmailAddress() != null) {
+                    EmailAddress emailAddress = watcher.getEmailAddress();
+                    watcherDto.setEmailAddress(emailAddress.getEmailAddress());
+                }
                 watcherDto.setFirstName(watcher.getFirstName());
                 watcherDto.setLastName(watcher.getLastName());
-                if (watcher.getEmailAddress() != null) {
-                    watcherDto.setEmailAddress(watcher.getEmailAddress().getEmailAddress());
-                }
                 if (watcher.getPhoneNumber() != null) {
-                    watcherDto.setPhonePrefix(watcher.getPhoneNumber().getPrefix());
-                    watcherDto.setPhoneNumber(watcher.getPhoneNumber().getNumber());
+                    PhoneNumber phoneNumber = watcher.getPhoneNumber();
+                    watcherDto.setPhonePrefix(phoneNumber.getPrefix());
+                    watcherDto.setPhoneNumber(phoneNumber.getNumber());
                 }
                 return watcherDto;
             }).collect(Collectors.toList());
@@ -121,14 +124,16 @@ public class StoryController {
 
             List<StakeholderDto> stakeholders = story.getStakeholders().stream().map(stakeholder -> {
                 StakeholderDto stakeholderDto = new StakeholderDto();
+                if (stakeholder.getEmailAddress() != null) {
+                    EmailAddress emailAddress = stakeholder.getEmailAddress();
+                    stakeholderDto.setEmailAddress(emailAddress.getEmailAddress());
+                }
                 stakeholderDto.setFirstName(stakeholder.getFirstName());
                 stakeholderDto.setLastName(stakeholder.getLastName());
-                if (stakeholder.getEmailAddress() != null) {
-                    stakeholderDto.setEmailAddress(stakeholder.getEmailAddress().getEmailAddress());
-                }
                 if (stakeholder.getPhoneNumber() != null) {
-                    stakeholderDto.setPhonePrefix(stakeholder.getPhoneNumber().getPrefix());
-                    stakeholderDto.setPhoneNumber(stakeholder.getPhoneNumber().getNumber());
+                    PhoneNumber phoneNumber = stakeholder.getPhoneNumber();
+                    stakeholderDto.setPhonePrefix(phoneNumber.getPrefix());
+                    stakeholderDto.setPhoneNumber(phoneNumber.getNumber());
                 }
                 return stakeholderDto;
             }).collect(Collectors.toList());
@@ -155,8 +160,6 @@ public class StoryController {
             } else {
                 User user = found.get();
                 Owner owner = new Owner();
-                owner.setFirstName(user.getUserName().getFirstName());
-                owner.setLastName(user.getUserName().getLastName());
 
                 if (user.getEmailAddress() != null) {
                     EmailAddress emailAddress = new EmailAddress();
@@ -164,10 +167,13 @@ public class StoryController {
                     owner.setEmailAddress(emailAddress);
                 }
 
+                owner.setFirstName(user.getUserName().getFirstName());
+                owner.setLastName(user.getUserName().getLastName());
+
                 if (user.getPhoneNumber() != null) {
                     PhoneNumber phoneNumber = new PhoneNumber();
-                    phoneNumber.setPrefix(user.getPhoneNumber().getPrefix());
                     phoneNumber.setNumber(user.getPhoneNumber().getNumber());
+                    phoneNumber.setPrefix(user.getPhoneNumber().getPrefix());
                     owner.setPhoneNumber(phoneNumber);
                 }
 
@@ -243,17 +249,20 @@ public class StoryController {
 
                     if (user.getPhoneNumber() != null) {
                         PhoneNumber phoneNumber = new PhoneNumber();
-                        phoneNumber.setPrefix(user.getPhoneNumber().getPrefix());
-                        phoneNumber.setNumber(user.getPhoneNumber().getNumber());
+                        PhoneNumber userPhoneNumber = user.getPhoneNumber();
+                        phoneNumber.setNumber(userPhoneNumber.getNumber());
+                        phoneNumber.setPrefix(userPhoneNumber.getPrefix());
                         owner.setPhoneNumber(phoneNumber);
                     }
 
-                    owner.setFirstName(user.getUserName().getFirstName());
-                    owner.setLastName(user.getUserName().getLastName());
+                    UserName userName = user.getUserName();
+                    owner.setFirstName(userName.getFirstName());
+                    owner.setLastName(userName.getLastName());
 
-                    if (user.getEmailAddress() != null) {
+                    EmailAddress userEmailAddress = user.getEmailAddress();
+                    if (userEmailAddress != null) {
                         EmailAddress emailAddress = new EmailAddress();
-                        emailAddress.setEmailAddress(user.getEmailAddress().getEmailAddress());
+                        emailAddress.setEmailAddress(userEmailAddress.getEmailAddress());
                         owner.setEmailAddress(emailAddress);
                     }
 
@@ -301,20 +310,23 @@ public class StoryController {
             try {
                 User user = findUserBy(dto.getId());
                 Watcher watcher = new Watcher();
-                watcher.setFirstName(user.getUserName().getFirstName());
                 watcher.setLastName(user.getUserName().getLastName());
+                watcher.setFirstName(user.getUserName().getFirstName());
 
-                if (user.getEmailAddress() != null) {
-                    EmailAddress emailAddress = new EmailAddress();
-                    emailAddress.setEmailAddress(user.getEmailAddress().getEmailAddress());
-                    watcher.setEmailAddress(emailAddress);
+                EmailAddress userEmailAddress = user.getEmailAddress();
+                PhoneNumber userPhoneNumber = user.getPhoneNumber();
+
+                if (userPhoneNumber != null) {
+                    PhoneNumber phoneNumber = new PhoneNumber();
+                    phoneNumber.setNumber(userPhoneNumber.getNumber());
+                    phoneNumber.setPrefix(userPhoneNumber.getPrefix());
+                    watcher.setPhoneNumber(phoneNumber);
                 }
 
-                if (user.getPhoneNumber() != null) {
-                    PhoneNumber phoneNumber = new PhoneNumber();
-                    phoneNumber.setPrefix(user.getPhoneNumber().getPrefix());
-                    phoneNumber.setNumber(user.getPhoneNumber().getNumber());
-                    watcher.setPhoneNumber(phoneNumber);
+                if (userEmailAddress != null) {
+                    EmailAddress emailAddress = new EmailAddress();
+                    emailAddress.setEmailAddress(userEmailAddress.getEmailAddress());
+                    watcher.setEmailAddress(emailAddress);
                 }
                 story.addWatcher(watcher);
 
@@ -340,19 +352,17 @@ public class StoryController {
             Watcher watcher = new Watcher();
 
             if (user.getPhoneNumber() != null) {
-                PhoneNumber phoneNumber = new PhoneNumber();
-                phoneNumber.setPrefix(user.getPhoneNumber().getPrefix());
-                phoneNumber.setNumber(user.getPhoneNumber().getNumber());
-                watcher.setPhoneNumber(phoneNumber);
+                watcher.setPhoneNumber(new PhoneNumber());
+                watcher.getPhoneNumber().setPrefix(user.getPhoneNumber().getPrefix());
+                watcher.getPhoneNumber().setNumber(user.getPhoneNumber().getNumber());
             }
 
             watcher.setFirstName(user.getUserName().getFirstName());
             watcher.setLastName(user.getUserName().getLastName());
 
             if (user.getEmailAddress() != null) {
-                EmailAddress emailAddress = new EmailAddress();
-                emailAddress.setEmailAddress(user.getEmailAddress().getEmailAddress());
-                watcher.setEmailAddress(emailAddress);
+                watcher.setEmailAddress(new EmailAddress());
+                watcher.getEmailAddress().setEmailAddress(user.getEmailAddress().getEmailAddress());
             }
 
             story.removeWatcher(watcher);
@@ -375,14 +385,8 @@ public class StoryController {
             try {
                 User user = findUserBy(dto.getId());
                 Stakeholder stakeholder = new Stakeholder();
-                stakeholder.setFirstName(user.getUserName().getFirstName());
                 stakeholder.setLastName(user.getUserName().getLastName());
-
-                if (user.getEmailAddress() != null) {
-                    EmailAddress emailAddress = new EmailAddress();
-                    emailAddress.setEmailAddress(user.getEmailAddress().getEmailAddress());
-                    stakeholder.setEmailAddress(emailAddress);
-                }
+                stakeholder.setFirstName(user.getUserName().getFirstName());
 
                 if (user.getPhoneNumber() != null) {
                     PhoneNumber phoneNumber = new PhoneNumber();
@@ -390,6 +394,13 @@ public class StoryController {
                     phoneNumber.setNumber(user.getPhoneNumber().getNumber());
                     stakeholder.setPhoneNumber(phoneNumber);
                 }
+
+                if (user.getEmailAddress() != null) {
+                    EmailAddress emailAddress = new EmailAddress();
+                    emailAddress.setEmailAddress(user.getEmailAddress().getEmailAddress());
+                    stakeholder.setEmailAddress(emailAddress);
+                }
+
                 story.addStakeholder(stakeholder);
 
                 storyRepository.save(story);
@@ -415,13 +426,14 @@ public class StoryController {
 
             if (user.getPhoneNumber() != null) {
                 PhoneNumber phoneNumber = new PhoneNumber();
-                phoneNumber.setPrefix(user.getPhoneNumber().getPrefix());
                 phoneNumber.setNumber(user.getPhoneNumber().getNumber());
+                phoneNumber.setPrefix(user.getPhoneNumber().getPrefix());
                 stakeholder.setPhoneNumber(phoneNumber);
             }
 
-            stakeholder.setFirstName(user.getUserName().getFirstName());
-            stakeholder.setLastName(user.getUserName().getLastName());
+            UserName userName = user.getUserName();
+            stakeholder.setLastName(userName.getLastName());
+            stakeholder.setFirstName(userName.getFirstName());
 
             if (user.getEmailAddress() != null) {
                 EmailAddress emailAddress = new EmailAddress();
