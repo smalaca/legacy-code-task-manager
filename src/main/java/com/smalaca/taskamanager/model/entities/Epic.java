@@ -19,6 +19,7 @@ import java.util.List;
 import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.TO_BE_DEFINED;
 
 @Entity
+@SuppressWarnings("MethodCount")
 public class Epic {
     @Id
     @GeneratedValue
