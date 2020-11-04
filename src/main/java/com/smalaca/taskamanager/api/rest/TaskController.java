@@ -64,77 +64,77 @@ public class TaskController {
 
         if (found.isPresent()) {
             Task task = found.get();
-            TaskDto taskDto = new TaskDto();
+            TaskDto dto = new TaskDto();
 
-            taskDto.setId(task.getId());
-            taskDto.setTitle(task.getTitle());
-            taskDto.setDescription(task.getDescription());
-            taskDto.setStatus(task.getStatus().name());
+            dto.setId(task.getId());
+            dto.setDescription(task.getDescription());
+            dto.setTitle(task.getTitle());
+            dto.setStatus(task.getStatus().name());
 
             if (task.getStory() != null) {
                 Story project = task.getStory();
-                taskDto.setStoryId(project.getId());
+                dto.setStoryId(project.getId());
             }
 
             Owner owner = task.getOwner();
 
             if (owner != null) {
-                taskDto.setOwnerFirstName(owner.getFirstName());
-                taskDto.setOwnerLastName(owner.getLastName());
+                dto.setOwnerLastName(owner.getLastName());
+                dto.setOwnerFirstName(owner.getFirstName());
 
                 PhoneNumber phoneNumber = owner.getPhoneNumber();
 
                 if (phoneNumber != null) {
-                    taskDto.setOwnerPhoneNumberPrefix(phoneNumber.getPrefix());
-                    taskDto.setOwnerPhoneNumberNumber(phoneNumber.getNumber());
+                    dto.setOwnerPhoneNumberNumber(phoneNumber.getNumber());
+                    dto.setOwnerPhoneNumberPrefix(phoneNumber.getPrefix());
                 }
 
                 EmailAddress emailAddress = owner.getEmailAddress();
 
                 if (emailAddress != null) {
-                    taskDto.setOwnerEmailAddress(emailAddress.getEmailAddress());
+                    dto.setOwnerEmailAddress(emailAddress.getEmailAddress());
                 }
             }
 
             List<WatcherDto> watchers = task.getWatchers().stream().map(watcher -> {
-                WatcherDto watcherDto = new WatcherDto();
-                watcherDto.setFirstName(watcher.getFirstName());
-                watcherDto.setLastName(watcher.getLastName());
+                WatcherDto wDto = new WatcherDto();
+                wDto.setLastName(watcher.getLastName());
+                wDto.setFirstName(watcher.getFirstName());
                 if (watcher.getEmailAddress() != null) {
-                    watcherDto.setEmailAddress(watcher.getEmailAddress().getEmailAddress());
+                    wDto.setEmailAddress(watcher.getEmailAddress().getEmailAddress());
                 }
                 if (watcher.getPhoneNumber() != null) {
-                    watcherDto.setPhonePrefix(watcher.getPhoneNumber().getPrefix());
-                    watcherDto.setPhoneNumber(watcher.getPhoneNumber().getNumber());
+                    wDto.setPhoneNumber(watcher.getPhoneNumber().getNumber());
+                    wDto.setPhonePrefix(watcher.getPhoneNumber().getPrefix());
                 }
-                return watcherDto;
+                return wDto;
             }).collect(Collectors.toList());
-            taskDto.setWatchers(watchers);
+            dto.setWatchers(watchers);
             
             if (task.getAssignee() != null) {
-                AssigneeDto assigneeDto = new AssigneeDto();
-                assigneeDto.setFirstName(task.getAssignee().getFirstName());
-                assigneeDto.setLastName(task.getAssignee().getLastName());
-                assigneeDto.setTeamId(task.getAssignee().getTeamId());
-                taskDto.setAssignee(assigneeDto);
+                AssigneeDto aDto = new AssigneeDto();
+                aDto.setTeamId(task.getAssignee().getTeamId());
+                aDto.setLastName(task.getAssignee().getLastName());
+                aDto.setFirstName(task.getAssignee().getFirstName());
+                dto.setAssignee(aDto);
             }
 
             List<StakeholderDto> stakeholders = task.getStakeholders().stream().map(stakeholder -> {
-                StakeholderDto stakeholderDto = new StakeholderDto();
-                stakeholderDto.setFirstName(stakeholder.getFirstName());
-                stakeholderDto.setLastName(stakeholder.getLastName());
+                StakeholderDto sDto = new StakeholderDto();
+                sDto.setLastName(stakeholder.getLastName());
+                sDto.setFirstName(stakeholder.getFirstName());
                 if (stakeholder.getEmailAddress() != null) {
-                    stakeholderDto.setEmailAddress(stakeholder.getEmailAddress().getEmailAddress());
+                    sDto.setEmailAddress(stakeholder.getEmailAddress().getEmailAddress());
                 }
                 if (stakeholder.getPhoneNumber() != null) {
-                    stakeholderDto.setPhonePrefix(stakeholder.getPhoneNumber().getPrefix());
-                    stakeholderDto.setPhoneNumber(stakeholder.getPhoneNumber().getNumber());
+                    sDto.setPhoneNumber(stakeholder.getPhoneNumber().getNumber());
+                    sDto.setPhonePrefix(stakeholder.getPhoneNumber().getPrefix());
                 }
-                return stakeholderDto;
+                return sDto;
             }).collect(Collectors.toList());
-            taskDto.setStakeholders(stakeholders);
+            dto.setStakeholders(stakeholders);
 
-            return ResponseEntity.ok(taskDto);
+            return ResponseEntity.ok(dto);
         }
 
         return ResponseEntity.notFound().build();
@@ -142,10 +142,10 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<Long> create(@RequestBody TaskDto dto) {
-        Task task = new Task();
-        task.setTitle(dto.getTitle());
-        task.setDescription(dto.getDescription());
-        task.setStatus(ToDoItemStatus.valueOf(dto.getStatus()));
+        Task t = new Task();
+        t.setTitle(dto.getTitle());
+        t.setDescription(dto.getDescription());
+        t.setStatus(ToDoItemStatus.valueOf(dto.getStatus()));
 
         if (dto.getOwnerId() != null) {
             Optional<User> found = userRepository.findById(dto.getOwnerId());
@@ -153,25 +153,25 @@ public class TaskController {
             if (found.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
             } else {
-                User user = found.get();
-                Owner owner = new Owner();
-                owner.setFirstName(user.getUserName().getFirstName());
-                owner.setLastName(user.getUserName().getLastName());
+                User u = found.get();
+                Owner o = new Owner();
+                o.setLastName(u.getUserName().getLastName());
+                o.setFirstName(u.getUserName().getFirstName());
 
-                if (user.getEmailAddress() != null) {
-                    EmailAddress emailAddress = new EmailAddress();
-                    emailAddress.setEmailAddress(user.getEmailAddress().getEmailAddress());
-                    owner.setEmailAddress(emailAddress);
+                if (u.getEmailAddress() != null) {
+                    EmailAddress ea = new EmailAddress();
+                    ea.setEmailAddress(u.getEmailAddress().getEmailAddress());
+                    o.setEmailAddress(ea);
                 }
 
-                if (user.getPhoneNumber() != null) {
-                    PhoneNumber phoneNumber = new PhoneNumber();
-                    phoneNumber.setPrefix(user.getPhoneNumber().getPrefix());
-                    phoneNumber.setNumber(user.getPhoneNumber().getNumber());
-                    owner.setPhoneNumber(phoneNumber);
+                if (u.getPhoneNumber() != null) {
+                    PhoneNumber pn = new PhoneNumber();
+                    pn.setNumber(u.getPhoneNumber().getNumber());
+                    pn.setPrefix(u.getPhoneNumber().getPrefix());
+                    o.setPhoneNumber(pn);
                 }
 
-                task.setOwner(owner);
+                t.setOwner(o);
             }
         }
 
@@ -186,9 +186,9 @@ public class TaskController {
             return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
         }
 
-        task.setStory(story);
+        t.setStory(story);
 
-        Task saved = taskRepository.save(task);
+        Task saved = taskRepository.save(t);
 
         return ResponseEntity.ok(saved.getId());
     }
@@ -214,24 +214,24 @@ public class TaskController {
         }
 
         if (task.getOwner() != null) {
-            Owner owner = new Owner();
-            owner.setFirstName(task.getOwner().getFirstName());
-            owner.setLastName(task.getOwner().getLastName());
+            Owner o = new Owner();
+            o.setFirstName(task.getOwner().getFirstName());
+            o.setLastName(task.getOwner().getLastName());
 
             if (dto.getOwnerPhoneNumberPrefix() != null && dto.getOwnerPhoneNumberNumber() != null) {
-                PhoneNumber phoneNumber = new PhoneNumber();
-                phoneNumber.setPrefix(dto.getOwnerPhoneNumberPrefix());
-                phoneNumber.setNumber(dto.getOwnerPhoneNumberNumber());
-                owner.setPhoneNumber(phoneNumber);
+                PhoneNumber pno = new PhoneNumber();
+                pno.setNumber(dto.getOwnerPhoneNumberNumber());
+                pno.setPrefix(dto.getOwnerPhoneNumberPrefix());
+                o.setPhoneNumber(pno);
             }
 
             if (dto.getOwnerEmailAddress() != null) {
-                EmailAddress emailAddress = new EmailAddress();
-                emailAddress.setEmailAddress(dto.getOwnerEmailAddress());
-                owner.setEmailAddress(emailAddress);
+                EmailAddress email = new EmailAddress();
+                email.setEmailAddress(dto.getOwnerEmailAddress());
+                o.setEmailAddress(email);
             }
 
-            task.setOwner(owner);
+            task.setOwner(o);
 
         } else {
             if (dto.getOwnerId() != null) {
@@ -239,25 +239,25 @@ public class TaskController {
 
                 if (userExists) {
                     User user = userRepository.findById(dto.getOwnerId()).get();
-                    Owner owner = new Owner();
+                    Owner ownr = new Owner();
 
                     if (user.getPhoneNumber() != null) {
-                        PhoneNumber phoneNumber = new PhoneNumber();
-                        phoneNumber.setPrefix(user.getPhoneNumber().getPrefix());
-                        phoneNumber.setNumber(user.getPhoneNumber().getNumber());
-                        owner.setPhoneNumber(phoneNumber);
+                        PhoneNumber number = new PhoneNumber();
+                        number.setNumber(user.getPhoneNumber().getNumber());
+                        number.setPrefix(user.getPhoneNumber().getPrefix());
+                        ownr.setPhoneNumber(number);
                     }
 
-                    owner.setFirstName(user.getUserName().getFirstName());
-                    owner.setLastName(user.getUserName().getLastName());
+                    ownr.setLastName(user.getUserName().getLastName());
+                    ownr.setFirstName(user.getUserName().getFirstName());
 
                     if (user.getEmailAddress() != null) {
-                        EmailAddress emailAddress = new EmailAddress();
-                        emailAddress.setEmailAddress(user.getEmailAddress().getEmailAddress());
-                        owner.setEmailAddress(emailAddress);
+                        EmailAddress eAdd = new EmailAddress();
+                        eAdd.setEmailAddress(user.getEmailAddress().getEmailAddress());
+                        ownr.setEmailAddress(eAdd);
                     }
 
-                    task.setOwner(owner);
+                    task.setOwner(ownr);
                 } else {
                     return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
                 }
@@ -296,29 +296,29 @@ public class TaskController {
     @PutMapping("/{id}/watcher")
     public ResponseEntity<Void> addWatcher(@PathVariable long id, @RequestBody WatcherDto dto) {
         try {
-            Task task = findTaskBy(id);
+            Task entity1 = findTaskBy(id);
 
             try {
-                User user = findUserBy(dto.getId());
-                Watcher watcher = new Watcher();
-                watcher.setFirstName(user.getUserName().getFirstName());
-                watcher.setLastName(user.getUserName().getLastName());
+                User entity2 = findUserBy(dto.getId());
+                Watcher entity3 = new Watcher();
+                entity3.setFirstName(entity2.getUserName().getFirstName());
+                entity3.setLastName(entity2.getUserName().getLastName());
 
-                if (user.getEmailAddress() != null) {
-                    EmailAddress emailAddress = new EmailAddress();
-                    emailAddress.setEmailAddress(user.getEmailAddress().getEmailAddress());
-                    watcher.setEmailAddress(emailAddress);
+                if (entity2.getEmailAddress() != null) {
+                    EmailAddress entity4 = new EmailAddress();
+                    entity4.setEmailAddress(entity2.getEmailAddress().getEmailAddress());
+                    entity3.setEmailAddress(entity4);
                 }
 
-                if (user.getPhoneNumber() != null) {
-                    PhoneNumber phoneNumber = new PhoneNumber();
-                    phoneNumber.setPrefix(user.getPhoneNumber().getPrefix());
-                    phoneNumber.setNumber(user.getPhoneNumber().getNumber());
-                    watcher.setPhoneNumber(phoneNumber);
+                if (entity2.getPhoneNumber() != null) {
+                    PhoneNumber entity5 = new PhoneNumber();
+                    entity5.setNumber(entity2.getPhoneNumber().getNumber());
+                    entity5.setPrefix(entity2.getPhoneNumber().getPrefix());
+                    entity3.setPhoneNumber(entity5);
                 }
-                task.addWatcher(watcher);
+                entity1.addWatcher(entity3);
 
-                taskRepository.save(task);
+                taskRepository.save(entity1);
 
             } catch (UserNotFoundException exception) {
                 return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
@@ -340,19 +340,19 @@ public class TaskController {
             Watcher watcher = new Watcher();
 
             if (user.getPhoneNumber() != null) {
-                PhoneNumber phoneNumber = new PhoneNumber();
-                phoneNumber.setPrefix(user.getPhoneNumber().getPrefix());
-                phoneNumber.setNumber(user.getPhoneNumber().getNumber());
-                watcher.setPhoneNumber(phoneNumber);
+                PhoneNumber no = new PhoneNumber();
+                no.setNumber(user.getPhoneNumber().getNumber());
+                no.setPrefix(user.getPhoneNumber().getPrefix());
+                watcher.setPhoneNumber(no);
             }
 
-            watcher.setFirstName(user.getUserName().getFirstName());
             watcher.setLastName(user.getUserName().getLastName());
+            watcher.setFirstName(user.getUserName().getFirstName());
 
             if (user.getEmailAddress() != null) {
-                EmailAddress emailAddress = new EmailAddress();
-                emailAddress.setEmailAddress(user.getEmailAddress().getEmailAddress());
-                watcher.setEmailAddress(emailAddress);
+                EmailAddress add = new EmailAddress();
+                add.setEmailAddress(user.getEmailAddress().getEmailAddress());
+                watcher.setEmailAddress(add);
             }
 
             task.removeWatcher(watcher);
@@ -375,20 +375,20 @@ public class TaskController {
             try {
                 User user = findUserBy(dto.getId());
                 Stakeholder stakeholder = new Stakeholder();
-                stakeholder.setFirstName(user.getUserName().getFirstName());
                 stakeholder.setLastName(user.getUserName().getLastName());
+                stakeholder.setFirstName(user.getUserName().getFirstName());
 
                 if (user.getEmailAddress() != null) {
-                    EmailAddress emailAddress = new EmailAddress();
-                    emailAddress.setEmailAddress(user.getEmailAddress().getEmailAddress());
-                    stakeholder.setEmailAddress(emailAddress);
+                    EmailAddress address = new EmailAddress();
+                    address.setEmailAddress(user.getEmailAddress().getEmailAddress());
+                    stakeholder.setEmailAddress(address);
                 }
 
                 if (user.getPhoneNumber() != null) {
-                    PhoneNumber phoneNumber = new PhoneNumber();
-                    phoneNumber.setPrefix(user.getPhoneNumber().getPrefix());
-                    phoneNumber.setNumber(user.getPhoneNumber().getNumber());
-                    stakeholder.setPhoneNumber(phoneNumber);
+                    PhoneNumber phNo = new PhoneNumber();
+                    phNo.setNumber(user.getPhoneNumber().getNumber());
+                    phNo.setPrefix(user.getPhoneNumber().getPrefix());
+                    stakeholder.setPhoneNumber(phNo);
                 }
                 task.addStakeholder(stakeholder);
 
@@ -411,25 +411,25 @@ public class TaskController {
             Task task = findTaskBy(taskId);
             User user = findUserBy(stakeholderId);
 
-            Stakeholder stakeholder = new Stakeholder();
+            Stakeholder stkh = new Stakeholder();
 
             if (user.getPhoneNumber() != null) {
                 PhoneNumber phoneNumber = new PhoneNumber();
-                phoneNumber.setPrefix(user.getPhoneNumber().getPrefix());
                 phoneNumber.setNumber(user.getPhoneNumber().getNumber());
-                stakeholder.setPhoneNumber(phoneNumber);
+                phoneNumber.setPrefix(user.getPhoneNumber().getPrefix());
+                stkh.setPhoneNumber(phoneNumber);
             }
 
-            stakeholder.setFirstName(user.getUserName().getFirstName());
-            stakeholder.setLastName(user.getUserName().getLastName());
+            stkh.setLastName(user.getUserName().getLastName());
+            stkh.setFirstName(user.getUserName().getFirstName());
 
             if (user.getEmailAddress() != null) {
                 EmailAddress emailAddress = new EmailAddress();
                 emailAddress.setEmailAddress(user.getEmailAddress().getEmailAddress());
-                stakeholder.setEmailAddress(emailAddress);
+                stkh.setEmailAddress(emailAddress);
             }
 
-            task.removeStakeholder(stakeholder);
+            task.removeStakeholder(stkh);
 
             taskRepository.save(task);
 
@@ -448,14 +448,14 @@ public class TaskController {
 
             try {
                 User user = findUserBy(dto.getId());
-                Assignee assignee = new Assignee();
-                assignee.setFirstName(user.getUserName().getFirstName());
-                assignee.setLastName(user.getUserName().getLastName());
+                Assignee asgn = new Assignee();
+                asgn.setLastName(user.getUserName().getLastName());
+                asgn.setFirstName(user.getUserName().getFirstName());
 
                 try {
                     findTeamBy(dto.getTeamId());
-                    assignee.setTeamId(dto.getTeamId());
-                    task.setAssignee(assignee);
+                    asgn.setTeamId(dto.getTeamId());
+                    task.setAssignee(asgn);
                     taskRepository.save(task);
                 } catch (TeamNotFoundException exception) {
                     return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
