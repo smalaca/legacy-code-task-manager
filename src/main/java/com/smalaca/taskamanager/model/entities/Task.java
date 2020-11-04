@@ -100,15 +100,15 @@ public class Task {
         return story;
     }
 
+    public void setAssignee(Assignee assignee) {
+        this.assignee = assignee;
+    }
+
     public void removeStakeholder(Stakeholder stakeholder) {
         if (!stakeholders.contains(stakeholder)) {
             throw new RuntimeException();
         }
         stakeholders.remove(stakeholder);
-    }
-
-    public void setAssignee(Assignee assignee) {
-        this.assignee = assignee;
     }
 
     public List<Stakeholder> getStakeholders() {
