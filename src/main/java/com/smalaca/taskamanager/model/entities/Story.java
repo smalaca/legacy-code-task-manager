@@ -12,15 +12,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.TO_BE_DEFINED;
 
 @Entity
-@SuppressWarnings("MethodCount")
-public class Epic {
+public class Story {
     @Id
     @GeneratedValue
     private Long id;
@@ -35,7 +33,7 @@ public class Epic {
     private Owner owner;
 
     @ManyToOne
-    private Project project;
+    private Epic epic;
 
     @ElementCollection
     private List<Watcher> watchers = new ArrayList<>();
@@ -46,59 +44,24 @@ public class Epic {
     @Embedded
     private Assignee assignee;
 
-    @OneToMany
-    private List<Story> stories = new ArrayList<>();
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
-    public ToDoItemStatus getStatus() {
-        return status;
-    }
-
     public void setStatus(ToDoItemStatus status) {
         this.status = status;
-    }
-
-    public Owner getOwner() {
-        return owner;
     }
 
     public void setOwner(Owner owner) {
         this.owner = owner;
     }
 
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-    }
-
-    public List<Watcher> getWatchers() {
-        return watchers;
-    }
-
-    public void addWatcher(Watcher watcher) {
-        watchers.add(watcher);
+    public void setEpic(Epic epic) {
+        this.epic = epic;
     }
 
     public void removeWatcher(Watcher watcher) {
@@ -106,14 +69,6 @@ public class Epic {
             throw new RuntimeException();
         }
         watchers.remove(watcher);
-    }
-
-    public List<Stakeholder> getStakeholders() {
-        return stakeholders;
-    }
-
-    public void addStakeholder(Stakeholder stakeholder) {
-        stakeholders.add(stakeholder);
     }
 
     public void removeStakeholder(Stakeholder stakeholder) {
@@ -131,11 +86,43 @@ public class Epic {
         this.assignee = assignee;
     }
 
-    public List<Story> getStories() {
-        return stories;
+    public Long getId() {
+        return id;
     }
 
-    public void addStory(Story story) {
-        stories.add(story);
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public ToDoItemStatus getStatus() {
+        return status;
+    }
+
+    public Owner getOwner() {
+        return owner;
+    }
+
+    public Epic getEpic() {
+        return epic;
+    }
+
+    public List<Watcher> getWatchers() {
+        return watchers;
+    }
+
+    public void addWatcher(Watcher watcher) {
+        watchers.add(watcher);
+    }
+
+    public List<Stakeholder> getStakeholders() {
+        return stakeholders;
+    }
+
+    public void addStakeholder(Stakeholder stakeholder) {
+        stakeholders.add(stakeholder);
     }
 }
