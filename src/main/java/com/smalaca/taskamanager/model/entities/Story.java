@@ -12,12 +12,14 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.TO_BE_DEFINED;
 
 @Entity
+@SuppressWarnings("MethodCount")
 public class Story {
     @Id
     @GeneratedValue
@@ -34,6 +36,9 @@ public class Story {
 
     @ManyToOne
     private Epic epic;
+
+    @OneToMany
+    private List<Task> tasks = new ArrayList<>();
 
     @ElementCollection
     private List<Watcher> watchers = new ArrayList<>();
@@ -124,5 +129,13 @@ public class Story {
 
     public void addStakeholder(Stakeholder stakeholder) {
         stakeholders.add(stakeholder);
+    }
+
+    public List<Task> getTasks() {
+        return tasks;
+    }
+
+    public void addTask(Task task) {
+        tasks.add(task);
     }
 }
