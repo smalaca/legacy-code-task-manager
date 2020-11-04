@@ -12,15 +12,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.TO_BE_DEFINED;
 
 @Entity
-public class Story {
+public class Task {
     @Id
     @GeneratedValue
     private Long id;
@@ -35,10 +33,7 @@ public class Story {
     private Owner owner;
 
     @ManyToOne
-    private Epic epic;
-
-    @OneToMany
-    private List<Task> tasks = new ArrayList<>();
+    private Story story;
 
     @ElementCollection
     private List<Watcher> watchers = new ArrayList<>();
@@ -49,24 +44,56 @@ public class Story {
     @Embedded
     private Assignee assignee;
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
+    public ToDoItemStatus getStatus() {
+        return status;
+    }
+
     public void setStatus(ToDoItemStatus status) {
         this.status = status;
+    }
+
+    public Owner getOwner() {
+        return owner;
     }
 
     public void setOwner(Owner owner) {
         this.owner = owner;
     }
 
-    public void setEpic(Epic epic) {
-        this.epic = epic;
+    public Story getStory() {
+        return story;
+    }
+
+    public void setStory(Story story) {
+        this.story = story;
+    }
+
+    public List<Watcher> getWatchers() {
+        return watchers;
+    }
+
+    public void addWatcher(Watcher watcher) {
+        watchers.add(watcher);
     }
 
     public void removeWatcher(Watcher watcher) {
@@ -74,6 +101,14 @@ public class Story {
             throw new RuntimeException();
         }
         watchers.remove(watcher);
+    }
+
+    public List<Stakeholder> getStakeholders() {
+        return stakeholders;
+    }
+
+    public void addStakeholder(Stakeholder stakeholder) {
+        stakeholders.add(stakeholder);
     }
 
     public void removeStakeholder(Stakeholder stakeholder) {
@@ -89,53 +124,5 @@ public class Story {
 
     public void setAssignee(Assignee assignee) {
         this.assignee = assignee;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public ToDoItemStatus getStatus() {
-        return status;
-    }
-
-    public Owner getOwner() {
-        return owner;
-    }
-
-    public Epic getEpic() {
-        return epic;
-    }
-
-    public List<Watcher> getWatchers() {
-        return watchers;
-    }
-
-    public void addWatcher(Watcher watcher) {
-        watchers.add(watcher);
-    }
-
-    public List<Stakeholder> getStakeholders() {
-        return stakeholders;
-    }
-
-    public void addStakeholder(Stakeholder stakeholder) {
-        stakeholders.add(stakeholder);
-    }
-
-    public List<Task> getTasks() {
-        return tasks;
-    }
-
-    public void addTask(Task task) {
-        tasks.add(task);
     }
 }
