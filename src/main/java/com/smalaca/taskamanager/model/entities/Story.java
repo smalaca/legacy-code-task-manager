@@ -13,13 +13,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.TO_BE_DEFINED;
 
 @Entity
+@SuppressWarnings("MethodCount")
 public class Story {
     @Id
     @GeneratedValue
