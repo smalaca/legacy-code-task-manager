@@ -25,6 +25,7 @@ import com.smalaca.taskamanager.repository.EpicRepository;
 import com.smalaca.taskamanager.repository.StoryRepository;
 import com.smalaca.taskamanager.repository.TeamRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
+import com.smalaca.taskamanager.service.ToDoItemService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,13 +50,16 @@ public class StoryController {
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final EpicRepository epicRepository;
+    private final ToDoItemService toDoItemService;
 
     public StoryController(
-            StoryRepository storyRepository, UserRepository userRepository, TeamRepository teamRepository, EpicRepository epicRepository) {
+            StoryRepository storyRepository, UserRepository userRepository, TeamRepository teamRepository,
+            EpicRepository epicRepository, ToDoItemService toDoItemService) {
         this.storyRepository = storyRepository;
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
         this.epicRepository = epicRepository;
+        this.toDoItemService = toDoItemService;
     }
 
     @Transactional
@@ -201,6 +205,7 @@ public class StoryController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(@PathVariable long id, @RequestBody StoryDto dto) {
+        boolean runService = false;
         Story story;
 
         try {
@@ -211,12 +216,6 @@ public class StoryController {
 
         if (dto.getDescription() != null) {
             story.setDescription(dto.getDescription());
-        }
-
-        if (dto.getStatus() != null) {
-            if (ToDoItemStatus.valueOf(dto.getStatus()) != story.getStatus()) {
-                story.setStatus(ToDoItemStatus.valueOf(dto.getStatus()));
-            }
         }
 
         if (story.getOwner() != null) {
@@ -272,7 +271,18 @@ public class StoryController {
                 }
             }
         }
+
+        if (dto.getStatus() != null) {
+            if (ToDoItemStatus.valueOf(dto.getStatus()) != story.getStatus()) {
+                runService = true;
+                story.setStatus(ToDoItemStatus.valueOf(dto.getStatus()));
+            }
+        }
+
         storyRepository.save(story);
+        if (runService) {
+            toDoItemService.processStory(story.getId());
+        }
 
         return ResponseEntity.ok().build();
     }

@@ -20,6 +20,7 @@ import com.smalaca.taskamanager.repository.EpicRepository;
 import com.smalaca.taskamanager.repository.StoryRepository;
 import com.smalaca.taskamanager.repository.TeamRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
+import com.smalaca.taskamanager.service.ToDoItemService;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpStatus;
@@ -28,18 +29,19 @@ import org.springframework.http.ResponseEntity;
 import java.lang.reflect.Field;
 import java.util.Optional;
 
+import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.IN_PROGRESS;
 import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.RELEASED;
-import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.TO_BE_DEFINED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 
 class StoryControllerTest {
     private static final String TITLE = "Title like all the others";
     private static final String DESCRIPTION = "Something have to be done";
-    private static final ToDoItemStatus STATUS = RELEASED;
+    private static final ToDoItemStatus STATUS = IN_PROGRESS;
     private static final String FIRST_NAME = "Nick";
     private static final String LAST_NAME = "Fury";
     private static final String EMAIL_ADDRESS = "nick.fury@shield.marvel.com";
@@ -62,7 +64,9 @@ class StoryControllerTest {
     private final UserRepository userRepository = mock(UserRepository.class);
     private final TeamRepository teamRepository = mock(TeamRepository.class);
     private final EpicRepository epicRepository = mock(EpicRepository.class);
-    private final StoryController controller = new StoryController(storyRepository, userRepository, teamRepository, epicRepository);
+    private final ToDoItemService toDoItemService = mock(ToDoItemService.class);
+    private final StoryController controller = new StoryController(
+            storyRepository, userRepository, teamRepository, epicRepository, toDoItemService);
     private final ArgumentCaptor<Story> storyCaptor = ArgumentCaptor.forClass(Story.class);
 
     @Test
@@ -213,6 +217,36 @@ class StoryControllerTest {
     }
 
     @Test
+    void shouldUpdateExistingStoryWithoutStatusChange() {
+        given(storyRepository.existsById(STORY_ID)).willReturn(true);
+        given(storyRepository.findById(STORY_ID)).willReturn(Optional.of(story()));
+
+        ResponseEntity<Void> actual = controller.update(STORY_ID, updateStoryDto());
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        then(storyRepository).should().save(storyCaptor.capture());
+        Story story = storyCaptor.getValue();
+        assertThat(story.getStatus()).isEqualTo(IN_PROGRESS);
+        then(toDoItemService).should(never()).processStory(any());
+    }
+
+    @Test
+    void shouldUpdateExistingStoryWithStatusChange() {
+        given(storyRepository.existsById(STORY_ID)).willReturn(true);
+        given(storyRepository.findById(STORY_ID)).willReturn(Optional.of(story()));
+        StoryDto dto = updateStoryDto();
+        dto.setStatus("RELEASED");
+
+        ResponseEntity<Void> actual = controller.update(STORY_ID, dto);
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        then(storyRepository).should().save(storyCaptor.capture());
+        Story story = storyCaptor.getValue();
+        assertThat(story.getStatus()).isEqualTo(RELEASED);
+        then(toDoItemService).should().processStory(STORY_ID);
+    }
+
+    @Test
     void shouldUpdateExistingStoryWithOwner() {
         given(storyRepository.existsById(STORY_ID)).willReturn(true);
         given(storyRepository.findById(STORY_ID)).willReturn(Optional.of(story()));
@@ -224,7 +258,7 @@ class StoryControllerTest {
         Story story = storyCaptor.getValue();
         assertThat(story.getTitle()).isEqualTo(TITLE);
         assertThat(story.getDescription()).isEqualTo("new description");
-        assertThat(story.getStatus()).isEqualTo(TO_BE_DEFINED);
+        assertThat(story.getStatus()).isEqualTo(IN_PROGRESS);
         assertThat(story.getOwner().getFirstName()).isEqualTo(FIRST_NAME);
         assertThat(story.getOwner().getLastName()).isEqualTo(LAST_NAME);
         assertThat(story.getOwner().getEmailAddress().getEmailAddress()).isEqualTo("john.doe@test.com");
@@ -247,7 +281,7 @@ class StoryControllerTest {
         Story story = storyCaptor.getValue();
         assertThat(story.getTitle()).isEqualTo(TITLE);
         assertThat(story.getDescription()).isEqualTo("new description");
-        assertThat(story.getStatus()).isEqualTo(TO_BE_DEFINED);
+        assertThat(story.getStatus()).isEqualTo(IN_PROGRESS);
         assertThat(story.getOwner().getFirstName()).isEqualTo(FIRST_NAME);
         assertThat(story.getOwner().getLastName()).isEqualTo(LAST_NAME);
         assertThat(story.getOwner().getEmailAddress().getEmailAddress()).isEqualTo(EMAIL_ADDRESS);
@@ -259,7 +293,7 @@ class StoryControllerTest {
     private StoryDto updateStoryDto() {
         StoryDto dto = new StoryDto();
         dto.setDescription("new description");
-        dto.setStatus("TO_BE_DEFINED");
+        dto.setStatus("IN_PROGRESS");
         dto.setOwnerEmailAddress("john.doe@test.com");
         dto.setOwnerPhoneNumberPrefix("9900");
         dto.setOwnerPhoneNumberNumber("8877665544");

@@ -24,6 +24,7 @@ import com.smalaca.taskamanager.repository.StoryRepository;
 import com.smalaca.taskamanager.repository.TaskRepository;
 import com.smalaca.taskamanager.repository.TeamRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
+import com.smalaca.taskamanager.service.ToDoItemService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,13 +49,16 @@ public class TaskController {
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final StoryRepository storyRepository;
+    private final ToDoItemService toDoItemService;
 
     public TaskController(
-            TaskRepository taskRepository, UserRepository userRepository, TeamRepository teamRepository, StoryRepository storyRepository) {
+            TaskRepository taskRepository, UserRepository userRepository, TeamRepository teamRepository,
+            StoryRepository storyRepository, ToDoItemService toDoItemService) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
         this.storyRepository = storyRepository;
+        this.toDoItemService = toDoItemService;
     }
 
     @Transactional
@@ -207,8 +211,10 @@ public class TaskController {
             task.setDescription(dto.getDescription());
         }
 
+        boolean service = false;
         if (dto.getStatus() != null) {
             if (ToDoItemStatus.valueOf(dto.getStatus()) != task.getStatus()) {
+                service = true;
                 task.setStatus(ToDoItemStatus.valueOf(dto.getStatus()));
             }
         }
@@ -264,6 +270,9 @@ public class TaskController {
             }
         }
         taskRepository.save(task);
+        if (service) {
+            toDoItemService.processTask(task.getId());
+        }
 
         return ResponseEntity.ok().build();
     }
