@@ -12,6 +12,7 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
@@ -49,6 +50,12 @@ public class Story implements ToDoItem {
 
     @Embedded
     private Assignee assignee;
+
+    @ManyToOne
+    private Sprint currentSprint;
+
+    @ManyToMany
+    private List<Sprint> sprints = new ArrayList<>();
 
     public void setTitle(String title) {
         this.title = title;
@@ -154,5 +161,21 @@ public class Story implements ToDoItem {
     @Override
     public boolean isAssigned() {
         return assignee != null;
+    }
+
+    public List<Sprint> getSprints() {
+        return sprints;
+    }
+
+    public void addSprint(Sprint sprint) {
+        sprints.add(sprint);
+    }
+
+    public Sprint getCurrentSprint() {
+        return currentSprint;
+    }
+
+    public void setCurrentSprint(Sprint currentSprint) {
+        this.currentSprint = currentSprint;
     }
 }

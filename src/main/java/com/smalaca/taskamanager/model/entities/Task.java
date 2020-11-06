@@ -46,6 +46,9 @@ public class Task implements ToDoItem {
     @Embedded
     private Assignee assignee;
 
+    @ManyToOne
+    private Sprint currentSprint;
+
     public String getTitle() {
         return title;
     }
@@ -142,5 +145,17 @@ public class Task implements ToDoItem {
     @Override
     public boolean isAssigned() {
         return assignee != null;
+    }
+
+    public void setCurrentSprint(Sprint currentSprint) {
+        this.currentSprint = currentSprint;
+    }
+
+    public Sprint getCurrentSprint() {
+        return currentSprint;
+    }
+
+    public boolean isSubtask() {
+        return story != null;
     }
 }

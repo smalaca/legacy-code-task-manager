@@ -5,6 +5,8 @@ import com.smalaca.taskamanager.model.entities.Project;
 import com.smalaca.taskamanager.model.entities.Sprint;
 import com.smalaca.taskamanager.repository.ProjectRepository;
 import com.smalaca.taskamanager.repository.SprintRepository;
+import com.smalaca.taskamanager.repository.StoryRepository;
+import com.smalaca.taskamanager.repository.TaskRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +32,11 @@ class SprintControllerTest {
     private static final String PROJECT_NAME = "Epic project";
 
     private final SprintRepository sprintRepository = mock(SprintRepository.class);
+    private final TaskRepository taskRepository = mock(TaskRepository.class);
+    private final StoryRepository storyRepository = mock(StoryRepository.class);
     private final ProjectRepository projectRepository = mock(ProjectRepository.class);
-    private final SprintController controller = new SprintController(sprintRepository, projectRepository);
+    private final SprintController controller = new SprintController(
+            sprintRepository, taskRepository, storyRepository, projectRepository);
 
     @Test
     void shouldNotFoundNotExistingSprint() {

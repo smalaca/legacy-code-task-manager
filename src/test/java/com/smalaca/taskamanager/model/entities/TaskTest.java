@@ -10,6 +10,22 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TaskTest {
     @Test
+    void shouldCreateTaskAsPartOfStory() {
+        Story story = new Story();
+
+        Task actual = new Task();
+        actual.setStory(story);
+
+        assertThat(actual.isSubtask()).isTrue();
+    }
+    @Test
+    void shouldCreateStandaloneTask() {
+        Task actual = new Task();
+
+        assertThat(actual.isSubtask()).isFalse();
+    }
+
+    @Test
     void shouldCreateTaskWithProject() {
         Story story = new Story();
         Epic epic = new Epic();
