@@ -5,6 +5,7 @@ import com.smalaca.taskamanager.model.embedded.Owner;
 import com.smalaca.taskamanager.model.embedded.Stakeholder;
 import com.smalaca.taskamanager.model.embedded.Watcher;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
+import com.smalaca.taskamanager.model.interfaces.ToDoItem;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
@@ -18,7 +19,8 @@ import java.util.List;
 import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.TO_BE_DEFINED;
 
 @Entity
-public class Task {
+@SuppressWarnings("MethodCount")
+public class Task implements ToDoItem {
     @Id
     @GeneratedValue
     private Long id;
@@ -56,10 +58,12 @@ public class Task {
         this.title = title;
     }
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public ToDoItemStatus getStatus() {
         return status;
     }
@@ -76,6 +80,7 @@ public class Task {
         this.description = description;
     }
 
+    @Override
     public Owner getOwner() {
         return owner;
     }
@@ -92,6 +97,7 @@ public class Task {
         watchers.add(watcher);
     }
 
+    @Override
     public List<Watcher> getWatchers() {
         return watchers;
     }
@@ -111,6 +117,7 @@ public class Task {
         this.assignee = assignee;
     }
 
+    @Override
     public List<Stakeholder> getStakeholders() {
         return stakeholders;
     }
@@ -122,7 +129,18 @@ public class Task {
         watchers.remove(watcher);
     }
 
+    @Override
     public Assignee getAssignee() {
         return assignee;
+    }
+
+    @Override
+    public Project getProject() {
+        return getStory().getEpic().getProject();
+    }
+
+    @Override
+    public boolean isAssigned() {
+        return assignee != null;
     }
 }

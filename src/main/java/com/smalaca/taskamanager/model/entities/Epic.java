@@ -5,6 +5,7 @@ import com.smalaca.taskamanager.model.embedded.Owner;
 import com.smalaca.taskamanager.model.embedded.Stakeholder;
 import com.smalaca.taskamanager.model.embedded.Watcher;
 import com.smalaca.taskamanager.model.enums.ToDoItemStatus;
+import com.smalaca.taskamanager.model.interfaces.ToDoItem;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
@@ -20,7 +21,7 @@ import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.TO_BE_DEFINED;
 
 @Entity
 @SuppressWarnings("MethodCount")
-public class Epic {
+public class Epic implements ToDoItem {
     @Id
     @GeneratedValue
     private Long id;
@@ -49,6 +50,7 @@ public class Epic {
     @OneToMany
     private List<Story> stories = new ArrayList<>();
 
+    @Override
     public Long getId() {
         return id;
     }
@@ -69,6 +71,7 @@ public class Epic {
         this.description = description;
     }
 
+    @Override
     public ToDoItemStatus getStatus() {
         return status;
     }
@@ -77,6 +80,7 @@ public class Epic {
         this.status = status;
     }
 
+    @Override
     public Owner getOwner() {
         return owner;
     }
@@ -85,6 +89,7 @@ public class Epic {
         this.owner = owner;
     }
 
+    @Override
     public Project getProject() {
         return project;
     }
@@ -93,6 +98,7 @@ public class Epic {
         this.project = project;
     }
 
+    @Override
     public List<Watcher> getWatchers() {
         return watchers;
     }
@@ -108,12 +114,18 @@ public class Epic {
         watchers.remove(watcher);
     }
 
+    @Override
     public List<Stakeholder> getStakeholders() {
         return stakeholders;
     }
 
     public void addStakeholder(Stakeholder stakeholder) {
         stakeholders.add(stakeholder);
+    }
+
+    @Override
+    public Assignee getAssignee() {
+        return assignee;
     }
 
     public void removeStakeholder(Stakeholder stakeholder) {
@@ -123,8 +135,9 @@ public class Epic {
         stakeholders.remove(stakeholder);
     }
 
-    public Assignee getAssignee() {
-        return assignee;
+    @Override
+    public boolean isAssigned() {
+        return assignee != null;
     }
 
     public void setAssignee(Assignee assignee) {
