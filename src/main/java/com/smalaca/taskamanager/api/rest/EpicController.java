@@ -24,6 +24,7 @@ import com.smalaca.taskamanager.repository.EpicRepository;
 import com.smalaca.taskamanager.repository.ProjectRepository;
 import com.smalaca.taskamanager.repository.TeamRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
+import com.smalaca.taskamanager.service.ToDoItemService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,13 +49,16 @@ public class EpicController {
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final ProjectRepository projectRepository;
+    private final ToDoItemService toDoItemService;
 
     public EpicController(
-            EpicRepository epicRepository, UserRepository userRepository, TeamRepository teamRepository, ProjectRepository projectRepository) {
+            EpicRepository epicRepository, UserRepository userRepository, TeamRepository teamRepository,
+            ProjectRepository projectRepository, ToDoItemService toDoItemService) {
         this.epicRepository = epicRepository;
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
         this.projectRepository = projectRepository;
+        this.toDoItemService = toDoItemService;
     }
 
     @Transactional
@@ -195,6 +199,7 @@ public class EpicController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(@PathVariable long id, @RequestBody EpicDto dto) {
+        boolean changed = false;
         Epic epic;
 
         try {
@@ -209,6 +214,7 @@ public class EpicController {
 
         if (dto.getStatus() != null) {
             if (ToDoItemStatus.valueOf(dto.getStatus()) != epic.getStatus()) {
+                changed = true;
                 epic.setStatus(ToDoItemStatus.valueOf(dto.getStatus()));
             }
         }
@@ -264,6 +270,10 @@ public class EpicController {
             }
         }
         epicRepository.save(epic);
+
+        if (changed) {
+            toDoItemService.processEpic(epic.getId());
+        }
 
         return ResponseEntity.ok().build();
     }

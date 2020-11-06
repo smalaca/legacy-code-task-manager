@@ -20,6 +20,7 @@ import com.smalaca.taskamanager.repository.StoryRepository;
 import com.smalaca.taskamanager.repository.TaskRepository;
 import com.smalaca.taskamanager.repository.TeamRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
+import com.smalaca.taskamanager.service.ToDoItemService;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpStatus;
@@ -28,18 +29,19 @@ import org.springframework.http.ResponseEntity;
 import java.lang.reflect.Field;
 import java.util.Optional;
 
+import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.IN_PROGRESS;
 import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.RELEASED;
-import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.TO_BE_DEFINED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 
 class TaskControllerTest {
     private static final String TITLE = "Title like all the others";
     private static final String DESCRIPTION = "Something have to be done";
-    private static final ToDoItemStatus STATUS = RELEASED;
+    private static final ToDoItemStatus STATUS = IN_PROGRESS;
     private static final String FIRST_NAME = "Nick";
     private static final String LAST_NAME = "Fury";
     private static final String EMAIL_ADDRESS = "nick.fury@shield.marvel.com";
@@ -62,7 +64,9 @@ class TaskControllerTest {
     private final UserRepository userRepository = mock(UserRepository.class);
     private final TeamRepository teamRepository = mock(TeamRepository.class);
     private final StoryRepository storyRepository = mock(StoryRepository.class);
-    private final TaskController controller = new TaskController(taskRepository, userRepository, teamRepository, storyRepository);
+    private final ToDoItemService toDoItemService = mock(ToDoItemService.class);
+    private final TaskController controller = new TaskController(
+            taskRepository, userRepository, teamRepository, storyRepository, toDoItemService);
     private final ArgumentCaptor<Task> taskCaptor = ArgumentCaptor.forClass(Task.class);
 
     @Test
@@ -213,6 +217,36 @@ class TaskControllerTest {
     }
 
     @Test
+    void shouldUpdateExistingTaskWithoutStatusChange() {
+        given(taskRepository.existsById(TASK_ID)).willReturn(true);
+        given(taskRepository.findById(TASK_ID)).willReturn(Optional.of(task()));
+
+        ResponseEntity<Void> actual = controller.update(TASK_ID, updateTaskDto());
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        then(taskRepository).should().save(taskCaptor.capture());
+        Task task = taskCaptor.getValue();
+        assertThat(task.getStatus()).isEqualTo(IN_PROGRESS);
+        then(toDoItemService).should(never()).processTask(any());
+    }
+
+    @Test
+    void shouldUpdateExistingTaskWithStatusChange() {
+        given(taskRepository.existsById(TASK_ID)).willReturn(true);
+        given(taskRepository.findById(TASK_ID)).willReturn(Optional.of(task()));
+        TaskDto dto = updateTaskDto();
+        dto.setStatus("RELEASED");
+
+        ResponseEntity<Void> actual = controller.update(TASK_ID, dto);
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        then(taskRepository).should().save(taskCaptor.capture());
+        Task task = taskCaptor.getValue();
+        assertThat(task.getStatus()).isEqualTo(RELEASED);
+        then(toDoItemService).should().processTask(TASK_ID);
+    }
+
+    @Test
     void shouldUpdateExistingTaskWithOwner() {
         given(taskRepository.existsById(TASK_ID)).willReturn(true);
         given(taskRepository.findById(TASK_ID)).willReturn(Optional.of(task()));
@@ -224,7 +258,7 @@ class TaskControllerTest {
         Task task = taskCaptor.getValue();
         assertThat(task.getTitle()).isEqualTo(TITLE);
         assertThat(task.getDescription()).isEqualTo("new description");
-        assertThat(task.getStatus()).isEqualTo(TO_BE_DEFINED);
+        assertThat(task.getStatus()).isEqualTo(IN_PROGRESS);
         assertThat(task.getOwner().getFirstName()).isEqualTo(FIRST_NAME);
         assertThat(task.getOwner().getLastName()).isEqualTo(LAST_NAME);
         assertThat(task.getOwner().getEmailAddress().getEmailAddress()).isEqualTo("john.doe@test.com");
@@ -247,7 +281,7 @@ class TaskControllerTest {
         Task task = taskCaptor.getValue();
         assertThat(task.getTitle()).isEqualTo(TITLE);
         assertThat(task.getDescription()).isEqualTo("new description");
-        assertThat(task.getStatus()).isEqualTo(TO_BE_DEFINED);
+        assertThat(task.getStatus()).isEqualTo(IN_PROGRESS);
         assertThat(task.getOwner().getFirstName()).isEqualTo(FIRST_NAME);
         assertThat(task.getOwner().getLastName()).isEqualTo(LAST_NAME);
         assertThat(task.getOwner().getEmailAddress().getEmailAddress()).isEqualTo(EMAIL_ADDRESS);
@@ -259,7 +293,7 @@ class TaskControllerTest {
     private TaskDto updateTaskDto() {
         TaskDto dto = new TaskDto();
         dto.setDescription("new description");
-        dto.setStatus("TO_BE_DEFINED");
+        dto.setStatus("IN_PROGRESS");
         dto.setOwnerEmailAddress("john.doe@test.com");
         dto.setOwnerPhoneNumberPrefix("9900");
         dto.setOwnerPhoneNumberNumber("8877665544");

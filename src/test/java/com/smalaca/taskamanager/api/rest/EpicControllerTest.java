@@ -20,6 +20,7 @@ import com.smalaca.taskamanager.repository.EpicRepository;
 import com.smalaca.taskamanager.repository.ProjectRepository;
 import com.smalaca.taskamanager.repository.TeamRepository;
 import com.smalaca.taskamanager.repository.UserRepository;
+import com.smalaca.taskamanager.service.ToDoItemService;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpStatus;
@@ -28,18 +29,19 @@ import org.springframework.http.ResponseEntity;
 import java.lang.reflect.Field;
 import java.util.Optional;
 
+import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.IN_PROGRESS;
 import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.RELEASED;
-import static com.smalaca.taskamanager.model.enums.ToDoItemStatus.TO_BE_DEFINED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 
 class EpicControllerTest {
     private static final String TITLE = "Title like all the others";
     private static final String DESCRIPTION = "Something have to be done";
-    private static final ToDoItemStatus STATUS = RELEASED;
+    private static final ToDoItemStatus STATUS = IN_PROGRESS;
     private static final String FIRST_NAME = "Nick";
     private static final String LAST_NAME = "Fury";
     private static final String EMAIL_ADDRESS = "nick.fury@shield.marvel.com";
@@ -62,7 +64,9 @@ class EpicControllerTest {
     private final UserRepository userRepository = mock(UserRepository.class);
     private final TeamRepository teamRepository = mock(TeamRepository.class);
     private final ProjectRepository projectRepository = mock(ProjectRepository.class);
-    private final EpicController controller = new EpicController(epicRepository, userRepository, teamRepository, projectRepository);
+    private final ToDoItemService toDoItemService = mock(ToDoItemService.class);
+    private final EpicController controller = new EpicController(
+            epicRepository, userRepository, teamRepository, projectRepository, toDoItemService);
     private final ArgumentCaptor<Epic> epicCaptor = ArgumentCaptor.forClass(Epic.class);
 
     @Test
@@ -213,6 +217,36 @@ class EpicControllerTest {
     }
 
     @Test
+    void shouldUpdateExistingEpicWithoutStatusChange() {
+        given(epicRepository.existsById(EPIC_ID)).willReturn(true);
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.of(epic()));
+
+        ResponseEntity<Void> actual = controller.update(EPIC_ID, updateEpicDto());
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        then(epicRepository).should().save(epicCaptor.capture());
+        Epic epic = epicCaptor.getValue();
+        assertThat(epic.getStatus()).isEqualTo(IN_PROGRESS);
+        then(toDoItemService).should(never()).processEpic(any());
+    }
+
+    @Test
+    void shouldUpdateExistingEpicWithStatusChange() {
+        given(epicRepository.existsById(EPIC_ID)).willReturn(true);
+        given(epicRepository.findById(EPIC_ID)).willReturn(Optional.of(epic()));
+        EpicDto dto = updateEpicDto();
+        dto.setStatus("RELEASED");
+
+        ResponseEntity<Void> actual = controller.update(EPIC_ID, dto);
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        then(epicRepository).should().save(epicCaptor.capture());
+        Epic epic = epicCaptor.getValue();
+        assertThat(epic.getStatus()).isEqualTo(RELEASED);
+        then(toDoItemService).should().processEpic(EPIC_ID);
+    }
+
+    @Test
     void shouldUpdateExistingEpicWithOwner() {
         given(epicRepository.existsById(EPIC_ID)).willReturn(true);
         given(epicRepository.findById(EPIC_ID)).willReturn(Optional.of(epic()));
@@ -224,7 +258,7 @@ class EpicControllerTest {
         Epic epic = epicCaptor.getValue();
         assertThat(epic.getTitle()).isEqualTo(TITLE);
         assertThat(epic.getDescription()).isEqualTo("new description");
-        assertThat(epic.getStatus()).isEqualTo(TO_BE_DEFINED);
+        assertThat(epic.getStatus()).isEqualTo(IN_PROGRESS);
         assertThat(epic.getOwner().getFirstName()).isEqualTo(FIRST_NAME);
         assertThat(epic.getOwner().getLastName()).isEqualTo(LAST_NAME);
         assertThat(epic.getOwner().getEmailAddress().getEmailAddress()).isEqualTo("john.doe@test.com");
@@ -247,7 +281,7 @@ class EpicControllerTest {
         Epic epic = epicCaptor.getValue();
         assertThat(epic.getTitle()).isEqualTo(TITLE);
         assertThat(epic.getDescription()).isEqualTo("new description");
-        assertThat(epic.getStatus()).isEqualTo(TO_BE_DEFINED);
+        assertThat(epic.getStatus()).isEqualTo(IN_PROGRESS);
         assertThat(epic.getOwner().getFirstName()).isEqualTo(FIRST_NAME);
         assertThat(epic.getOwner().getLastName()).isEqualTo(LAST_NAME);
         assertThat(epic.getOwner().getEmailAddress().getEmailAddress()).isEqualTo(EMAIL_ADDRESS);
@@ -259,7 +293,7 @@ class EpicControllerTest {
     private EpicDto updateEpicDto() {
         EpicDto dto = new EpicDto();
         dto.setDescription("new description");
-        dto.setStatus("TO_BE_DEFINED");
+        dto.setStatus("IN_PROGRESS");
         dto.setOwnerEmailAddress("john.doe@test.com");
         dto.setOwnerPhoneNumberPrefix("9900");
         dto.setOwnerPhoneNumberNumber("8877665544");
