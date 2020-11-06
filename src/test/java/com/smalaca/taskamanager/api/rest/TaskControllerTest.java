@@ -162,7 +162,7 @@ class TaskControllerTest {
     }
 
     @Test
-    void shouldCreateStory() {
+    void shouldCreateTask() {
         given(storyRepository.existsById(STORY_ID)).willReturn(true);
         given(storyRepository.findById(STORY_ID)).willReturn(Optional.of(story()));
         given(userRepository.findById(OWNER_ID)).willReturn(Optional.of(owner()));
@@ -186,12 +186,40 @@ class TaskControllerTest {
     }
 
     private TaskDto newTaskDto() {
+        TaskDto dto = newStandaloneTaskDto();
+        dto.setStoryId(STORY_ID);
+
+        return dto;
+    }
+
+    @Test
+    void shouldCreateStandaloneTask() {
+        given(userRepository.findById(OWNER_ID)).willReturn(Optional.of(owner()));
+        given(taskRepository.save(any())).willReturn(taskWithId());
+
+        ResponseEntity<Long> actual = controller.create(newStandaloneTaskDto());
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(actual.getBody()).isEqualTo(TASK_ID);
+        then(taskRepository).should().save(taskCaptor.capture());
+        Task task = taskCaptor.getValue();
+        assertThat(task.getTitle()).isEqualTo(TITLE);
+        assertThat(task.getDescription()).isEqualTo(DESCRIPTION);
+        assertThat(task.getStatus()).isEqualTo(STATUS);
+        assertThat(task.getOwner().getFirstName()).isEqualTo(FIRST_NAME);
+        assertThat(task.getOwner().getLastName()).isEqualTo(LAST_NAME);
+        assertThat(task.getOwner().getEmailAddress().getEmailAddress()).isEqualTo(EMAIL_ADDRESS);
+        assertThat(task.getOwner().getPhoneNumber().getPrefix()).isEqualTo(PHONE_PREFIX);
+        assertThat(task.getOwner().getPhoneNumber().getNumber()).isEqualTo(PHONE_NUMBER);
+        assertThat(task.getStory()).isNull();
+    }
+
+    private TaskDto newStandaloneTaskDto() {
         TaskDto dto = new TaskDto();
         dto.setTitle(TITLE);
         dto.setDescription(DESCRIPTION);
         dto.setStatus(STATUS.name());
         dto.setOwnerId(OWNER_ID);
-        dto.setStoryId(STORY_ID);
 
         return dto;
     }

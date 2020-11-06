@@ -179,18 +179,20 @@ public class TaskController {
             }
         }
 
-        Story story;
-        try {
-            if (!storyRepository.existsById(dto.getStoryId())) {
-                throw new ProjectNotFoundException();
+        if (dto.getStoryId() != null) {
+            Story story;
+            try {
+                if (!storyRepository.existsById(dto.getStoryId())) {
+                    throw new ProjectNotFoundException();
+                }
+
+                story = storyRepository.findById(dto.getStoryId()).get();
+            } catch (ProjectNotFoundException exception) {
+                return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
             }
 
-            story = storyRepository.findById(dto.getStoryId()).get();
-        } catch (ProjectNotFoundException exception) {
-            return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+            t.setStory(story);
         }
-
-        t.setStory(story);
 
         Task saved = taskRepository.save(t);
 
