@@ -104,6 +104,9 @@ public class SprintController {
                 sprint.addTask(task);
                 task.setCurrentSprint(sprint);
 
+                taskRepository.save(task);
+                sprintRepository.save(sprint);
+
                 return new ResponseEntity<>(HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -126,6 +129,9 @@ public class SprintController {
                 sprint.addStory(story);
                 story.addSprint(sprint);
                 story.setCurrentSprint(sprint);
+
+                storyRepository.save(story);
+                sprintRepository.save(sprint);
 
                 return new ResponseEntity<>(HttpStatus.OK);
             } else {
