@@ -123,6 +123,11 @@ public class Epic implements ToDoItem {
         stakeholders.add(stakeholder);
     }
 
+    @Override
+    public Assignee getAssignee() {
+        return assignee;
+    }
+
     public void removeStakeholder(Stakeholder stakeholder) {
         if (!stakeholders.contains(stakeholder)) {
             throw new RuntimeException();
@@ -131,17 +136,12 @@ public class Epic implements ToDoItem {
     }
 
     @Override
-    public Assignee getAssignee() {
-        return assignee;
+    public boolean isAssigned() {
+        return assignee != null;
     }
 
     public void setAssignee(Assignee assignee) {
         this.assignee = assignee;
-    }
-
-    @Override
-    public boolean isAssigned() {
-        return assignee != null;
     }
 
     public List<Story> getStories() {
