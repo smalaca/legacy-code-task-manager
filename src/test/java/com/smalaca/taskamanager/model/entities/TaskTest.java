@@ -10,12 +10,26 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TaskTest {
     @Test
+    void shouldCreateTaskWithProject() {
+        Story story = new Story();
+        Epic epic = new Epic();
+        Project project = new Project();
+        epic.setProject(project);
+        story.setEpic(epic);
+        Task actual = new Task();
+        actual.setStory(story);
+
+        assertThat(actual.getProject()).isSameAs(project);
+    }
+
+    @Test
     void shouldCreateTaskWithAssignee() {
         Task task = new Task();
         task.setAssignee(assignee("Tony", "Stark"));
 
         assertThat(task.getAssignee().getFirstName()).isEqualTo("Tony");
         assertThat(task.getAssignee().getLastName()).isEqualTo("Stark");
+        assertThat(task.isAssigned()).isTrue();
     }
 
     @Test
@@ -26,6 +40,7 @@ class TaskTest {
         task.setAssignee(null);
 
         assertThat(task.getAssignee()).isNull();
+        assertThat(task.isAssigned()).isFalse();
     }
 
     private Assignee assignee(String firstName, String lastName) {

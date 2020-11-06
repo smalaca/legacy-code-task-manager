@@ -16,6 +16,7 @@ class EpicTest {
 
         assertThat(epic.getAssignee().getFirstName()).isEqualTo("Tony");
         assertThat(epic.getAssignee().getLastName()).isEqualTo("Stark");
+        assertThat(epic.isAssigned()).isTrue();
     }
 
     @Test
@@ -26,6 +27,7 @@ class EpicTest {
         epic.setAssignee(null);
 
         assertThat(epic.getAssignee()).isNull();
+        assertThat(epic.isAssigned()).isFalse();
     }
 
     private Assignee assignee(String firstName, String lastName) {

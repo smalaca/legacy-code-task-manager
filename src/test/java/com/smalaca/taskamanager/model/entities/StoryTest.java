@@ -10,12 +10,24 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class StoryTest {
     @Test
+    void shouldCreateStoryWithProject() {
+        Story actual = new Story();
+        Epic epic = new Epic();
+        Project project = new Project();
+        epic.setProject(project);
+        actual.setEpic(epic);
+
+        assertThat(actual.getProject()).isSameAs(project);
+    }
+
+    @Test
     void shouldCreateStoryWithAssignee() {
         Story story = new Story();
         story.setAssignee(assignee("Tony", "Stark"));
 
         assertThat(story.getAssignee().getFirstName()).isEqualTo("Tony");
         assertThat(story.getAssignee().getLastName()).isEqualTo("Stark");
+        assertThat(story.isAssigned()).isTrue();
     }
 
     @Test
@@ -26,6 +38,7 @@ class StoryTest {
         story.setAssignee(null);
 
         assertThat(story.getAssignee()).isNull();
+        assertThat(story.isAssigned()).isFalse();
     }
 
     private Assignee assignee(String firstName, String lastName) {
