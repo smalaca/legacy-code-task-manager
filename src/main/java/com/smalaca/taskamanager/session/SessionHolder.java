@@ -2,7 +2,7 @@ package com.smalaca.taskamanager.session;
 
 import com.smalaca.taskamanager.model.entities.User;
 
-public class SessionHolder {
+public final class SessionHolder {
     private static final SessionHolder INSTANCE = new SessionHolder();
 
     private User user;
