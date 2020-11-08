@@ -22,12 +22,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CommunicationServiceImpl implements CommunicationService {
-    private CommunicatorType type;
+    private static final String SEPARATOR = ".";
+
     private final ProjectBacklogService projectBacklogService;
     private final DevNullDirectory devNullDirectory;
     private final ChatClient chat;
     private final SmsCommunicatorClient smsCommunicator;
     private final MailClient mailClient;
+    private CommunicatorType type;
 
     public CommunicationServiceImpl(
             ProjectBacklogService projectBacklogService, DevNullDirectory devNullDirectory, ChatClient chat,
@@ -44,6 +46,7 @@ public class CommunicationServiceImpl implements CommunicationService {
         this.type = type;
     }
 
+    @SuppressWarnings("MissingSwitchDefault")
     public void notify(ToDoItem toDoItem, ProductOwner productOwner) {
         switch (type) {
             case MAIL:
@@ -53,7 +56,7 @@ public class CommunicationServiceImpl implements CommunicationService {
                 notifyAbout(toDoItem, productOwner.getPhoneNumber());
                 break;
             case DIRECT:
-                notifyAbout(toDoItem, productOwner.getFirstName() + "." + productOwner.getLastName());
+                notifyAbout(toDoItem, productOwner.getFirstName() + SEPARATOR + productOwner.getLastName());
                 break;
             case NULL_TYPE:
                 notifyAbout();
@@ -61,6 +64,7 @@ public class CommunicationServiceImpl implements CommunicationService {
         }
     }
 
+    @SuppressWarnings("MissingSwitchDefault")
     public void notify(ToDoItem toDoItem, Owner owner) {
         switch (type) {
             case SMS:
@@ -70,7 +74,7 @@ public class CommunicationServiceImpl implements CommunicationService {
                 notifyAbout(toDoItem, owner.getEmailAddress());
                 break;
             case DIRECT:
-                notifyAbout(toDoItem, owner.getFirstName() + "." + owner.getLastName());
+                notifyAbout(toDoItem, owner.getFirstName() + SEPARATOR + owner.getLastName());
                 break;
             case NULL_TYPE:
                 notifyAbout();
@@ -78,13 +82,14 @@ public class CommunicationServiceImpl implements CommunicationService {
         }
     }
 
+    @SuppressWarnings("MissingSwitchDefault")
     public void notify(ToDoItem toDoItem, Watcher watcher) {
         switch (type) {
             case SMS:
                 notifyAbout(toDoItem, watcher.getPhoneNumber());
                 break;
             case DIRECT:
-                notifyAbout(toDoItem, watcher.getFirstName() + "." + watcher.getLastName());
+                notifyAbout(toDoItem, watcher.getFirstName() + SEPARATOR + watcher.getLastName());
                 break;
             case MAIL:
                 notifyAbout(toDoItem, watcher.getEmailAddress());
@@ -95,6 +100,7 @@ public class CommunicationServiceImpl implements CommunicationService {
         }
     }
 
+    @SuppressWarnings("MissingSwitchDefault")
     public void notify(ToDoItem toDoItem, User user) {
         switch (type) {
             case SMS:
@@ -112,10 +118,11 @@ public class CommunicationServiceImpl implements CommunicationService {
         }
     }
 
+    @SuppressWarnings("MissingSwitchDefault")
     public void notify(ToDoItem toDoItem, Stakeholder stakeholder) {
         switch (type) {
             case DIRECT:
-                notifyAbout(toDoItem, stakeholder.getFirstName() + "." + stakeholder.getLastName());
+                notifyAbout(toDoItem, stakeholder.getFirstName() + SEPARATOR + stakeholder.getLastName());
                 break;
             case SMS:
                 notifyAbout(toDoItem, stakeholder.getPhoneNumber());
