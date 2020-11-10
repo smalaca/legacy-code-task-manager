@@ -183,6 +183,11 @@ class EpicControllerTest {
         assertThat(epic.getOwner().getPhoneNumber().getPrefix()).isEqualTo(PHONE_PREFIX);
         assertThat(epic.getOwner().getPhoneNumber().getNumber()).isEqualTo(PHONE_NUMBER);
         assertThat(epic.getProject().getId()).isEqualTo(PROJECT_ID);
+        ArgumentCaptor<Project> projectCaptor = ArgumentCaptor.forClass(Project.class);
+        then(projectRepository).should().save(projectCaptor.capture());
+        assertThat(projectCaptor.getValue().getEpics())
+                .hasSize(1)
+                .allSatisfy(actualStory -> assertThat(actualStory).isSameAs(epic));
     }
 
     private EpicDto newEpicDto() {

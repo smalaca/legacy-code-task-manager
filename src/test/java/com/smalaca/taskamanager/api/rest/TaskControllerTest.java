@@ -183,6 +183,11 @@ class TaskControllerTest {
         assertThat(task.getOwner().getPhoneNumber().getPrefix()).isEqualTo(PHONE_PREFIX);
         assertThat(task.getOwner().getPhoneNumber().getNumber()).isEqualTo(PHONE_NUMBER);
         assertThat(task.getStory().getId()).isEqualTo(STORY_ID);
+        ArgumentCaptor<Story> storyCaptor = ArgumentCaptor.forClass(Story.class);
+        then(storyRepository).should().save(storyCaptor.capture());
+        assertThat(storyCaptor.getValue().getTasks())
+                .hasSize(1)
+                .allSatisfy(actualTask -> assertThat(actualTask).isSameAs(task));
     }
 
     private TaskDto newTaskDto() {

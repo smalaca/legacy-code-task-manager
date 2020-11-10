@@ -191,7 +191,9 @@ public class EpicController {
         }
 
         epic.setProject(project);
+        project.addEpic(epic);
 
+        projectRepository.save(project);
         Epic saved = epicRepository.save(epic);
 
         return ResponseEntity.ok(saved.getId());
