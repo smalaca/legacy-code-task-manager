@@ -197,8 +197,10 @@ public class StoryController {
         }
 
         story.setEpic(epic);
+        epic.addStory(story);
 
         Story saved = storyRepository.save(story);
+        epicRepository.save(epic);
 
         return ResponseEntity.ok(saved.getId());
     }

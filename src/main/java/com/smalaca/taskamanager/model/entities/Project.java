@@ -72,6 +72,13 @@ public class Project {
         teams.add(team);
     }
 
+    public void removeTeam(Team team) {
+        if (!teams.contains(team)) {
+            throw new RuntimeException();
+        }
+        teams.remove(team);
+    }
+
     public List<Epic> getEpics() {
         return epics;
     }

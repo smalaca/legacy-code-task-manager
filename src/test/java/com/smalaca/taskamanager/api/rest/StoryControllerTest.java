@@ -183,6 +183,11 @@ class StoryControllerTest {
         assertThat(story.getOwner().getPhoneNumber().getPrefix()).isEqualTo(PHONE_PREFIX);
         assertThat(story.getOwner().getPhoneNumber().getNumber()).isEqualTo(PHONE_NUMBER);
         assertThat(story.getEpic().getId()).isEqualTo(EPIC_ID);
+        ArgumentCaptor<Epic> epicCaptor = ArgumentCaptor.forClass(Epic.class);
+        then(epicRepository).should().save(epicCaptor.capture());
+        assertThat(epicCaptor.getValue().getStories())
+                .hasSize(1)
+                .allSatisfy(actualStory -> assertThat(actualStory).isSameAs(story));
     }
 
     private StoryDto newStoryDto() {
