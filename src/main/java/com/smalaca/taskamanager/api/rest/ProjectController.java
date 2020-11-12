@@ -2,10 +2,12 @@ package com.smalaca.taskamanager.api.rest;
 
 import com.smalaca.taskamanager.dto.ProjectDto;
 import com.smalaca.taskamanager.exception.ProjectNotFoundException;
+import com.smalaca.taskamanager.exception.TeamNotFoundException;
 import com.smalaca.taskamanager.model.entities.Project;
 import com.smalaca.taskamanager.model.entities.Team;
 import com.smalaca.taskamanager.model.enums.ProjectStatus;
 import com.smalaca.taskamanager.repository.ProjectRepository;
+import com.smalaca.taskamanager.repository.TeamRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,15 +24,18 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/project")
 public class ProjectController {
     private final ProjectRepository projectRepository;
+    private final TeamRepository teamRepository;
 
-    public ProjectController(ProjectRepository projectRepository) {
+    public ProjectController(ProjectRepository projectRepository, TeamRepository teamRepository) {
         this.projectRepository = projectRepository;
+        this.teamRepository = teamRepository;
     }
 
     @GetMapping
@@ -135,7 +140,68 @@ public class ProjectController {
         }
     }
 
+
+    @PutMapping("/{projectId}/teams/{teamId}")
+    @Transactional
+    public ResponseEntity<Void> addTeam(@PathVariable Long projectId, @PathVariable Long teamId) {
+        try {
+            Project project = getProjectById(projectId);
+
+            try {
+                Team team = getTeamById(teamId);
+
+                project.addTeam(team);
+                team.setProject(project);
+
+                projectRepository.save(project);
+                teamRepository.save(team);
+
+                return new ResponseEntity<>(HttpStatus.OK);
+            } catch (TeamNotFoundException exception) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+        } catch (ProjectNotFoundException exception) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/{projectId}/teams/{teamId}")
+    @Transactional
+    public ResponseEntity<Void> removeTeam(@PathVariable Long projectId, @PathVariable Long teamId) {
+        try {
+            Project project = getProjectById(projectId);
+
+            try {
+                Team team = getTeamById(teamId);
+
+                project.removeTeam(team);
+                team.setProject(null);
+
+                projectRepository.save(project);
+                teamRepository.save(team);
+
+                return new ResponseEntity<>(HttpStatus.OK);
+            } catch (TeamNotFoundException exception) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+        } catch (ProjectNotFoundException exception) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     private Project getProjectById(Long id) {
         return projectRepository.findById(id).orElseThrow(ProjectNotFoundException::new);
+    }
+
+    private Team getTeamById(Long id) {
+        Optional<Team> team = teamRepository.findById(id);
+
+        if (team.isEmpty()) {
+            throw new TeamNotFoundException();
+        }
+
+        return team.get();
     }
 }
