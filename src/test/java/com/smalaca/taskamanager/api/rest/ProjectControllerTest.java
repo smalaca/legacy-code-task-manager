@@ -6,6 +6,7 @@ import com.smalaca.taskamanager.model.entities.Project;
 import com.smalaca.taskamanager.model.entities.Team;
 import com.smalaca.taskamanager.model.enums.ProjectStatus;
 import com.smalaca.taskamanager.repository.ProjectRepository;
+import com.smalaca.taskamanager.repository.TeamRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import static com.smalaca.taskamanager.model.enums.ProjectStatus.COMPLETED;
 import static com.smalaca.taskamanager.model.enums.ProjectStatus.IDEA;
 import static com.smalaca.taskamanager.model.enums.ProjectStatus.PROOF_OF_CONCEPT;
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -29,12 +31,18 @@ import static org.mockito.Mockito.mock;
 import static org.springframework.web.util.UriComponentsBuilder.fromUriString;
 
 class ProjectControllerTest {
-    private final ProjectRepository repository = mock(ProjectRepository.class);
-    private final ProjectController controller = new ProjectController(repository);
+    private static final long PROJECT_ID = 13;
+    private static final long TEAM_ID_1 = 98;
+    private static final long TEAM_ID_2 = 17;
+    private static final long NEW_TEAM_ID = 42;
+
+    private final ProjectRepository projectRepository = mock(ProjectRepository.class);
+    private final TeamRepository teamRepository = mock(TeamRepository.class);
+    private final ProjectController controller = new ProjectController(projectRepository, teamRepository);
 
     @Test
     void shouldFindAllProjects() {
-        given(repository.findAll()).willReturn(asList(
+        given(projectRepository.findAll()).willReturn(asList(
                 project(1, "Avengers vs. X-Men", PROOF_OF_CONCEPT),
                 project(2, "Fantastic Four vs. X-Men", IDEA, 13),
                 project(3, "Empyre", ANALYSIS_OF_ROI, 42)
@@ -66,9 +74,9 @@ class ProjectControllerTest {
 
     @Test
     void shouldRecognizeProjectIsNotFound() {
-        given(repository.findById(13L)).willReturn(Optional.empty());
+        given(projectRepository.findById(PROJECT_ID)).willReturn(Optional.empty());
 
-        ResponseEntity<ProjectDto> actual = controller.getProject(13L);
+        ResponseEntity<ProjectDto> actual = controller.getProject(PROJECT_ID);
 
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(actual.getBody()).isNull();
@@ -79,9 +87,9 @@ class ProjectControllerTest {
         Project project = project(13, "Schizm", COMPLETED, 113);
         project.addTeam(withId(new Team(), 1));
         project.addTeam(withId(new Team(), 2));
-        given(repository.findById(13L)).willReturn(Optional.of(project));
+        given(projectRepository.findById(PROJECT_ID)).willReturn(Optional.of(project));
 
-        ResponseEntity<ProjectDto> actual = controller.getProject(13L);
+        ResponseEntity<ProjectDto> actual = controller.getProject(PROJECT_ID);
 
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
         ProjectDto actualProject = actual.getBody();
@@ -94,7 +102,7 @@ class ProjectControllerTest {
 
     @Test
     void shouldRecognizeProjectAlreadyExist() {
-        given(repository.findByName("Weapon X")).willReturn(Optional.of(new Project()));
+        given(projectRepository.findByName("Weapon X")).willReturn(Optional.of(new Project()));
         ProjectDto dto = new ProjectDto();
         dto.setName("Weapon X");
 
@@ -106,8 +114,8 @@ class ProjectControllerTest {
     @Test
     void shouldCreateProject() {
         UriComponentsBuilder uriComponentsBuilder = fromUriString("/");
-        given(repository.findByName("Weapon X")).willReturn(Optional.empty());
-        given(repository.save(any())).willReturn(withId(new Project(), 69));
+        given(projectRepository.findByName("Weapon X")).willReturn(Optional.empty());
+        given(projectRepository.save(any())).willReturn(withId(new Project(), 69));
         ProjectDto dto = new ProjectDto();
         dto.setName("Weapon X");
 
@@ -116,17 +124,17 @@ class ProjectControllerTest {
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(actual.getHeaders().getLocation().getPath()).isEqualTo("/project/69");
         ArgumentCaptor<Project> captor = ArgumentCaptor.forClass(Project.class);
-        then(repository).should().save(captor.capture());
+        then(projectRepository).should().save(captor.capture());
         assertThat(captor.getValue().getName()).isEqualTo("Weapon X");
     }
 
     @Test
     void shouldRecognizeThereIsNoProjectToUpdate() {
-        given(repository.findById(13L)).willReturn(Optional.empty());
+        given(projectRepository.findById(PROJECT_ID)).willReturn(Optional.empty());
         ProjectDto dto = new ProjectDto();
         dto.setProjectStatus("COMPLETED");
 
-        ResponseEntity<ProjectDto> actual = controller.updateProject(13L, dto);
+        ResponseEntity<ProjectDto> actual = controller.updateProject(PROJECT_ID, dto);
 
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(actual.getBody()).isNull();
@@ -134,12 +142,12 @@ class ProjectControllerTest {
 
     @Test
     void shouldUpdateProject() {
-        given(repository.findById(13L)).willReturn(Optional.of(project(2, "Fantastic Four vs. X-Men", IDEA, 13)));
-        given(repository.save(any())).willAnswer(invocation -> invocation.getArgument(0));
+        given(projectRepository.findById(PROJECT_ID)).willReturn(Optional.of(project(2, "Fantastic Four vs. X-Men", IDEA, 13)));
+        given(projectRepository.save(any())).willAnswer(invocation -> invocation.getArgument(0));
         ProjectDto dto = new ProjectDto();
         dto.setProjectStatus("COMPLETED");
 
-        ResponseEntity<ProjectDto> actual = controller.updateProject(13L, dto);
+        ResponseEntity<ProjectDto> actual = controller.updateProject(PROJECT_ID, dto);
 
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
         ProjectDto projectDto = actual.getBody();
@@ -151,9 +159,9 @@ class ProjectControllerTest {
 
     @Test
     void shouldRecognizeThereIsNoProjectToDelete() {
-        given(repository.findById(13L)).willReturn(Optional.empty());
+        given(projectRepository.findById(PROJECT_ID)).willReturn(Optional.empty());
 
-        ResponseEntity<Void> actual = controller.deleteProject(13L);
+        ResponseEntity<Void> actual = controller.deleteProject(PROJECT_ID);
 
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(actual.getBody()).isNull();
@@ -162,12 +170,104 @@ class ProjectControllerTest {
     @Test
     void shouldDeleteProject() {
         Project project = withId(new Project(), 13);
-        given(repository.findById(13L)).willReturn(Optional.of(project));
+        given(projectRepository.findById(PROJECT_ID)).willReturn(Optional.of(project));
 
-        ResponseEntity<Void> actual = controller.deleteProject(13L);
+        ResponseEntity<Void> actual = controller.deleteProject(PROJECT_ID);
 
         assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
-        then(repository).should().delete(project);
+        then(projectRepository).should().delete(project);
+    }
+
+    @Test
+    void shouldRecognizeThereIsNoProjectToAddTeam() {
+        given(projectRepository.findById(PROJECT_ID)).willReturn(Optional.empty());
+
+        ResponseEntity<Void> actual = controller.addTeam(PROJECT_ID, NEW_TEAM_ID);
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void shouldRecognizeTeamToAddDoesNotExist() {
+        given(projectRepository.findById(PROJECT_ID)).willReturn(Optional.of(existingProjectWithTeam()));
+        given(teamRepository.findById(NEW_TEAM_ID)).willReturn(Optional.empty());
+
+        ResponseEntity<Void> actual = controller.addTeam(PROJECT_ID, NEW_TEAM_ID);
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void shouldAssignTeamToProject() {
+        given(projectRepository.findById(PROJECT_ID)).willReturn(Optional.of(existingProjectWithTeam()));
+        given(teamRepository.findById(NEW_TEAM_ID)).willReturn(Optional.of(notAssignedTeam(NEW_TEAM_ID)));
+
+        ResponseEntity<Void> actual = controller.addTeam(PROJECT_ID, NEW_TEAM_ID);
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        ArgumentCaptor<Project> projectCaptor = ArgumentCaptor.forClass(Project.class);
+        then(projectRepository).should().save(projectCaptor.capture());
+        assertThat(asTeamIds(projectCaptor.getValue())).containsExactlyInAnyOrder(TEAM_ID_1, TEAM_ID_2, NEW_TEAM_ID);
+        ArgumentCaptor<Team> teamCaptor = ArgumentCaptor.forClass(Team.class);
+        then(teamRepository).should().save(teamCaptor.capture());
+        Project teamProject = teamCaptor.getValue().getProject();
+        assertThat(teamProject.getId()).isEqualTo(PROJECT_ID);
+    }
+
+    private List<Long> asTeamIds(Project actualProject) {
+        List<Long> teamIds = actualProject.getTeams().stream().map(Team::getId).collect(toList());
+        return teamIds;
+    }
+
+    @Test
+    void shouldRecognizeThereIsNoProjectToRemoveTeam() {
+        given(projectRepository.findById(PROJECT_ID)).willReturn(Optional.empty());
+
+        ResponseEntity<Void> actual = controller.removeTeam(PROJECT_ID, TEAM_ID_2);
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void shouldRecognizeTeamToRemoveDoesNotExist() {
+        given(projectRepository.findById(PROJECT_ID)).willReturn(Optional.of(existingProjectWithTeam()));
+        given(teamRepository.findById(TEAM_ID_2)).willReturn(Optional.empty());
+
+        ResponseEntity<Void> actual = controller.removeTeam(PROJECT_ID, TEAM_ID_2);
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void shouldRemoveTeamToProject() {
+        Project project = existingProjectWithTeam();
+        Team team = withId(new Team(), TEAM_ID_2);
+        team.setProject(project);
+        given(projectRepository.findById(PROJECT_ID)).willReturn(Optional.of(project));
+        given(teamRepository.findById(TEAM_ID_2)).willReturn(Optional.of(team));
+
+        ResponseEntity<Void> actual = controller.removeTeam(PROJECT_ID, TEAM_ID_2);
+
+        assertThat(actual.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        ArgumentCaptor<Project> projectCaptor = ArgumentCaptor.forClass(Project.class);
+        then(projectRepository).should().save(projectCaptor.capture());
+        assertThat(asTeamIds(projectCaptor.getValue())).containsExactlyInAnyOrder(TEAM_ID_1);
+        ArgumentCaptor<Team> teamCaptor = ArgumentCaptor.forClass(Team.class);
+        then(teamRepository).should().save(teamCaptor.capture());
+        assertThat(teamCaptor.getValue().getProject()).isNull();
+    }
+
+    private Team notAssignedTeam(long id) {
+        return withId(new Team(), id);
+    }
+
+    private Project existingProjectWithTeam() {
+        Project project = withId(new Project(), PROJECT_ID);
+        project.addTeam(withId(new Team(), TEAM_ID_1));
+        project.addTeam(withId(new Team(), TEAM_ID_2));
+        return project;
     }
 
     private Project project(int id, String name, ProjectStatus projectStatus, int productOwnerId) {
