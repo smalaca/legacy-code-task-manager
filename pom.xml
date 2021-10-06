@@ -30,6 +30,7 @@
     <pitest-maven.version>1.5.1</pitest-maven.version>
     <pitest-junit5-plugin.version>0.12</pitest-junit5-plugin.version>
     <commons-lang3.version>3.9</commons-lang3.version>
+    <lombok.version>1.18.16</lombok.version>
   </properties>
 
   <scm>
@@ -70,6 +71,12 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
       <version>${commons-lang3.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
     </dependency>
 
     <!-- TEST SCOPE -->
