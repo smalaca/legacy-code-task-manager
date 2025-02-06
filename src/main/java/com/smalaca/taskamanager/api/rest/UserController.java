@@ -8,6 +8,7 @@ import com.smalaca.taskamanager.model.embedded.UserName;
 import com.smalaca.taskamanager.model.entities.User;
 import com.smalaca.taskamanager.model.enums.TeamRole;
 import com.smalaca.taskamanager.repository.UserRepository;
+import com.smalaca.taskmanager.domain.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -110,16 +111,7 @@ public class UserController {
         if (exists(userDto)) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         } else {
-            User user = new User();
-            user.setTeamRole(TeamRole.valueOf(userDto.getTeamRole()));
-            UserName userName = new UserName();
-            userName.setFirstName(userDto.getFirstName());
-            userName.setLastName(userDto.getLastName());
-            user.setUserName(userName);
-            user.setLogin(userDto.getLogin());
-            user.setPassword(userDto.getPassword());
-
-            User saved = userRepository.save(user);
+            User saved = new UserService(userRepository).create(userDto);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setLocation(uriComponentsBuilder.path("/user/{id}").buildAndExpand(saved.getId()).toUri());
