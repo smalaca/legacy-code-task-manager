@@ -7,9 +7,9 @@ import com.smalaca.taskamanager.model.enums.TeamRole;
 import com.smalaca.taskamanager.repository.UserRepository;
 
 public class UserService {
-    private final UserRepository userRepository;
+    private final UserDomainRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserDomainRepository userRepository) {
         this.userRepository = userRepository;
     }
 

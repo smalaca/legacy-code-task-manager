@@ -1,5 +1,6 @@
 package com.smalaca.taskamanager.api.rest;
 
+import com.smalaca.acl.user.AclUserDomainRepository;
 import com.smalaca.taskamanager.dto.UserDto;
 import com.smalaca.taskamanager.exception.UserNotFoundException;
 import com.smalaca.taskamanager.model.embedded.EmailAddress;
@@ -8,6 +9,7 @@ import com.smalaca.taskamanager.model.embedded.UserName;
 import com.smalaca.taskamanager.model.entities.User;
 import com.smalaca.taskamanager.model.enums.TeamRole;
 import com.smalaca.taskamanager.repository.UserRepository;
+import com.smalaca.taskmanager.domain.user.UserDomainRepository;
 import com.smalaca.taskmanager.domain.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -111,7 +113,9 @@ public class UserController {
         if (exists(userDto)) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         } else {
-            User saved = new UserService(userRepository).create(userDto);
+
+            UserDomainRepository acl = new AclUserDomainRepository(userRepository);
+            User saved = new UserService(acl).create(userDto);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setLocation(uriComponentsBuilder.path("/user/{id}").buildAndExpand(saved.getId()).toUri());
