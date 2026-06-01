@@ -33,12 +33,6 @@
     <lombok.version>1.18.16</lombok.version>
   </properties>
 
-  <scm>
-    <url>https://github.com/smalaca/legacy-code-task-manager</url>
-    <connection>scm:git:https://github.com/smalaca/legacy-code-task-manager.git</connection>
-    <developerConnection>scm:git:https://github.com/smalaca/legacy-code-task-manager.git</developerConnection>
-  </scm>
-
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
