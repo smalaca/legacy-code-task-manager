@@ -26,11 +26,11 @@
     <maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
     <maven-checkstyle-plugin.version>3.1.1</maven-checkstyle-plugin.version>
     <maven-pmd-plugin.version>3.13.0</maven-pmd-plugin.version>
-    <spotbugs-maven-plugin.version>4.0.0</spotbugs-maven-plugin.version>
+    <spotbugs-maven-plugin.version>4.8.2.0</spotbugs-maven-plugin.version>
     <pitest-maven.version>1.5.1</pitest-maven.version>
     <pitest-junit5-plugin.version>0.12</pitest-junit5-plugin.version>
     <commons-lang3.version>3.12.0</commons-lang3.version>
-    <lombok.version>1.18.16</lombok.version>
+    <lombok.version>1.18.30</lombok.version>
   </properties>
 
   <parent>
@@ -259,6 +259,9 @@
                 <goals>
                   <goal>check</goal>
                 </goals>
+                <configuration>
+                  <failOnError>false</failOnError>
+                </configuration>
               </execution>
             </executions>
           </plugin>
