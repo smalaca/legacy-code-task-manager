@@ -1,2 +1,1 @@
-- here there have to be placed project description
-- tell about the tests and those that are good 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=smalaca_legacy-code-task-manager&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=smalaca_legacy-code-task-manager)
