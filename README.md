@@ -1,1 +1,2 @@
-here there have to be placed project description
+- here there have to be placed project description
+- tell about the tests and those that are good 
