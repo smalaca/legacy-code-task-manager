@@ -9,6 +9,18 @@ This is not intended to be a reference for well-written code. On the contrary, i
 
 If you are looking for an example of well-designed microservices, you might want to check out [Training Center Microservices](https://github.com/smalaca/training-center-microservices).
 
+## How to Start
+If you want to use this repository to upskill yourself, pay attention to the testing strategy:
+*   **Support for Refactoring**: Tests in the package `com.smalaca.taskamanager.api.rest` are written in a way that supports refactoring and redesign. When they fail, you can safely assume you broke something.
+*   **Implementation-Coupled Tests**: Almost all other tests are tightly coupled to the implementation. Relying on them during refactoring is difficult as they often fail due to changes in internal structure rather than broken behavior.
+
+### Good vs. Bad Tests Comparison
+To see the difference between tests that support refactoring and those that hinder it, compare:
+*   `UserControllerTest`: Focuses on behavior, uses an in-memory repository, and is not fragile.
+*   `UserControllerMockTest`: Focuses on implementation details, relies heavily on mocks, and is very fragile.
+
+Try performing a few refactorings in `UserController` and observe which tests fail and why. You'll notice that `UserControllerMockTest` often fails because it "tests" how the code is written, while `UserControllerTest` remains green as long as the behavior is preserved.
+
 ## Domain Perspective
 The project covers a classic Task Management domain, supporting Agile-like workflows. It includes entities such as:
 *   **Projects**: High-level containers for all work.
