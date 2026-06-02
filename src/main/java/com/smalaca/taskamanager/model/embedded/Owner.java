@@ -14,8 +14,8 @@ public class Owner {
     private String lastName;
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "prefix", column = @Column(name = "owner_phone_prefix")),
-            @AttributeOverride(name = "number", column = @Column(name = "owner_phone_number"))
+        @AttributeOverride(name = "prefix", column = @Column(name = "owner_phone_prefix")),
+        @AttributeOverride(name = "number", column = @Column(name = "owner_phone_number"))
     })
     private PhoneNumber phoneNumber;
     @Embedded

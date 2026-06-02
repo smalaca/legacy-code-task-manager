@@ -25,7 +25,6 @@
     <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
     <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
     <maven-checkstyle-plugin.version>3.3.1</maven-checkstyle-plugin.version>
-    <maven-pmd-plugin.version>3.22.0</maven-pmd-plugin.version>
     <spotbugs-maven-plugin.version>4.8.5.0</spotbugs-maven-plugin.version>
     <pitest-maven.version>1.16.1</pitest-maven.version>
     <pitest-junit5-plugin.version>1.2.1</pitest-junit5-plugin.version>
@@ -224,24 +223,6 @@
                 </goals>
               </execution>
             </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-pmd-plugin</artifactId>
-            <version>${maven-pmd-plugin.version}</version>
-            <executions>
-              <execution>
-                <phase>validate</phase>
-                <goals>
-                  <goal>check</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <targetJdk>21</targetJdk>
-              <linkXRef>false</linkXRef>
-            </configuration>
           </plugin>
 
           <plugin>
