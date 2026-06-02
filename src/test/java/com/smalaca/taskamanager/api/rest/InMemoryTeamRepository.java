@@ -112,6 +112,11 @@ class InMemoryTeamRepository implements TeamRepository {
     }
 
     @Override
+    public void deleteAllById(Iterable<? extends Long> longs) {
+
+    }
+
+    @Override
     public void deleteAll(Iterable<? extends Team> iterable) {
 
     }
