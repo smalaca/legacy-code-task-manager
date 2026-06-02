@@ -3,10 +3,16 @@
 # Legacy Code Task Manager
 
 ## Purpose
-Are you looking for a place to practice refactoring techniques, architectural re-design, or to test new ways of handling legacy systems? If so, this project is designed specifically for you. It serves as a playground for developers who want to improve their skills in transforming "ugly" code into something clean and maintainable.
+Most developers never get a realistic environment to practice refactoring or architecture evolution. Toy examples are too small, and production systems are too risky. This repository is intentionally designed as a painful legacy system playground to bridge that gap.
 
-This is not intended to be a reference for well-written code. On the contrary, it is an intentional example of how NOT to design a system and how NOT to write tests. It provides a non-trivial codebase that is large enough to demonstrate real-world coupling and boundary issues, yet small enough to be manageable for training purposes.
+It is large enough to practice:
+*   **Refactoring Techniques**: Improving code quality without changing behavior.
+*   **Rearchitecture Strategies**: Moving from a "Big Ball of Mud" to a more structured design.
+*   **Legacy Code Modernization**: Updating old patterns to modern standards.
+*   **Testing Improvements**: Transforming fragile, implementation-coupled tests into valuable behavior-focused ones.
+*   **Modularization**: Introducing and enforcing better architectural boundaries.
 
+### Looking for an Example of Well-Designed Microservices?
 If you are looking for an example of well-designed microservices, you might want to check out [Training Center Microservices](https://github.com/smalaca/training-center-microservices).
 
 ## How to Start
@@ -49,3 +55,7 @@ The project boasts a high test coverage (over 95%), but the tests are designed t
 *   **Low Expressiveness**: It is difficult to understand what business requirements are being verified.
 *   **Technical Focus**: Most tests focus on the technical aspects of the infrastructure rather than business outcomes.
 *   **Verification Strategy**: Uses JUnit 5, Mockito, and AssertJ, but often in ways that make refactoring harder instead of easier.
+
+## Collaboration
+Feel free to fork it, raise issues, or open pull requests. Just remember: **the goal of this repository is to 
+stay bad and underdesigned on purpose.**
