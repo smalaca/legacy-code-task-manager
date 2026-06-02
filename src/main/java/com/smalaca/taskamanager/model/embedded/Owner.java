@@ -1,10 +1,10 @@
 package com.smalaca.taskamanager.model.embedded;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 
 @Embeddable
 public class Owner {
@@ -14,8 +14,8 @@ public class Owner {
     private String lastName;
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "prefix", column = @Column(name = "owner_phone_prefix")),
-            @AttributeOverride(name = "number", column = @Column(name = "owner_phone_number"))
+        @AttributeOverride(name = "prefix", column = @Column(name = "owner_phone_prefix")),
+        @AttributeOverride(name = "number", column = @Column(name = "owner_phone_number"))
     })
     private PhoneNumber phoneNumber;
     @Embedded

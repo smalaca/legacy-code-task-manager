@@ -7,17 +7,19 @@ import com.smalaca.taskamanager.model.enums.TeamRole;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "USERS")
 @SuppressWarnings("MethodCount")
 public class User {
     @Id
@@ -38,7 +40,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private TeamRole teamRole;
 
-    @OneToMany
+    @ManyToMany(mappedBy = "members")
     private List<Team> teams = new ArrayList<>();
 
     public UserName getUserName() {
